@@ -4,7 +4,13 @@ Ray Tutorial
 Setup
 -----
 
-1. Install Ray by following the `Ray installation instructions`_.
+1. Install Ray by following the `Ray installation instructions`_. Verify that
+   the following works.
+
+  .. code-block:: bash
+
+    python ray/test/runtest.py
+
 
 2. Clone the tutorial repository with
 
