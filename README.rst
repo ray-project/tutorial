@@ -30,3 +30,22 @@ Setup
 
   Verify that you can run ``import tensorflow`` and ``import gym`` in a Python
   interpreter.
+
+
+Exercises
+---------
+
+**Exercise 1:** Define a remote function, and execute multiple remote functions
+in parallel.
+
+**Exercise 2:** Use ``ray.wait`` to process tasks in the order that they finish.
+
+**Exercise 3:** Pass object IDs into tasks to construct dependencies between
+tasks.
+
+**Exercise 4:** Call remote functions from within remote functions.
+
+**Exercise 5:** Create a neural network inside of an actor.
+
+**Exercise 6:** Extract neural network weights from an actor on one process, and
+set them in another actor.
