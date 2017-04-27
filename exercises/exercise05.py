@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
     return trajectory
 
-  # Run two experiments in parallel.
+  # Do some rollouts in parallel.
   rollout_ids = [rollout.remote("Pong-v0", 1, AtariPixelPreprocessor(), config, 0.995, 1.0, 2000)
                  for _ in range(8)]
   rollouts = ray.get(rollout_ids)
