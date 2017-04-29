@@ -29,8 +29,5 @@ if __name__ == "__main__":
     print("Processing result which finished after {} seconds."
           .format(result - start_time))
 
-  if results == sorted(results):
-    print("SUCCESS: The results were processed in the order they finished.")
-  else:
-    print("FAILURE: The results were not processed in the order they "
-          "finished.")
+  assert results == sorted(results), ("The results were not processed in the "
+                                      "order that they finished.")

@@ -45,7 +45,5 @@ if __name__ == "__main__":
   end_time = time.time()
   duration = end_time - start_time
 
-  if duration < 1.5:
-    print("SUCCESS: The experiments ran in {} seconds.".format(duration))
-  else:
-    print("FAILURE: The experiments ran in {} seconds.".format(duration))
+  assert duration < 1.5, ("The experiments ran in {} seconds. This is too "
+                          "slow.".format(duration))

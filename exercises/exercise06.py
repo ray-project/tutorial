@@ -41,7 +41,5 @@ if __name__ == "__main__":
 
   assert results == [1, 1, 2, 2, 3, 3, 4, 4, 5, 5]
 
-  if duration > 3:
-    print("FAILURE: The experiments ran in {} seconds.".format(duration))
-  else:
-    print("SUCCESS: The experiments ran in {} seconds.".format(duration))
+  assert duration < 3, ("The experiments ran in {} seconds. This is too "
+                        "slow.".format(duration))

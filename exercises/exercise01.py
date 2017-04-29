@@ -30,8 +30,5 @@ if __name__ == "__main__":
   end_time = time.time()
   duration = end_time - start_time
 
-  if duration > 1.1:
-    raise Exception("The loop took {} seconds. This is too slow."
-                    .format(duration))
-  else:
-    print("The loop took {} seconds. Congratulations!".format(duration))
+  assert duration < 1.1, ("The loop took {} seconds. This is too slow."
+                          .format(duration))
