@@ -4,71 +4,44 @@ from __future__ import print_function
 
 import numpy as np
 import ray
-import tensorflow as tf
 import time
 
-from ray_tutorial.reinforce.env import BatchedEnv
-from ray_tutorial.reinforce.policy import ProximalPolicyLoss
-from ray_tutorial.reinforce.filter import MeanStdFilter
-from ray_tutorial.reinforce.rollout import rollouts, add_advantage_values
-
-from ray_tutorial.reinforce.env import (NoPreprocessor, AtariRamPreprocessor,
-                                        AtariPixelPreprocessor)
-from ray_tutorial.reinforce.models.fc_net import fc_net
-from ray_tutorial.reinforce.models.vision_net import vision_net
-
-# The goal of this exercise is to show how to use send neural network weights
-# between workers and the driver. Since, pickling and unpickling a TensorFlow
-# graph can be inefficient or may not work at all, it is most efficient to ship
-# the weights between processes as a dictionary of numpy arrays. We use the
-# helper class ray.experimental.TensorFlowVariables to help with this. Similar
-# techniques should work other neural net libraries.
-
+# The goal of this exercise is to show how to create an actor and to call actor
+# methods.
 
 if __name__ == "__main__":
   ray.init(num_cpus=4, redirect_output=True)
 
-  # This actor contains a simple neural network.
-  #
-  # Exercise: Implement the set_weights and get_weights methods so that the
-  # driver can retrieve the weights from the actor and set new weights on the
-  # actor.
-  @ray.actor
-  class SimpleModel(object):
+  class Foo(object):
     def __init__(self):
-      x_data = tf.placeholder(tf.float32, shape=[100])
-      y_data = tf.placeholder(tf.float32, shape=[100])
+      self.counter = 0
 
-      w = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
-      b = tf.Variable(tf.zeros([1]))
-      y = w * x_data + b
+    def increment(self):
+      time.sleep(0.5)
+      self.counter += 1
+      return self.counter
 
-      self.loss = tf.reduce_mean(tf.square(y - y_data))
-      optimizer = tf.train.GradientDescentOptimizer(0.5)
-      grads = optimizer.compute_gradients(loss)
-      self.train = optimizer.apply_gradients(grads)
+  # Create two Foo objects.
+  f1 = Foo()
+  f2 = Foo()
 
-      init = tf.global_variables_initializer()
-      self.sess = tf.Session()
+  start_time = time.time()
 
-      self.sess.run(init)
+  # We want to parallelize this code. However, it is not straightforward to
+  # make "increment" a remote function, because state is shared (the value of
+  # "self.counter") between subsequent calls to "increment". In this case, it
+  # makes sense to use actors.
+  results = []
+  for _ in range(5):
+    results.append(f1.increment())
+    results.append(f2.increment())
 
-    def set_weights(self, weights):
-      # Exercise: Implement this.
-      pass
+  end_time = time.time()
+  duration = end_time - start_time
 
-    def get_weights(self):
-      # Exercise: Implement this.
-      pass
+  assert results == [1, 1, 2, 2, 3, 3, 4, 4, 5, 5]
 
-  # Create a few actors with the model.
-  actors = [SimpleModel() for _ in range(4)]
-
-  # EXERCISE: Get the weights from the actors.
-  # FILL THIS IN.
-
-  # EXERCISE: Average the weights.
-  # FILL THIS IN.
-
-  # EXERCISE: Set the average weights on the actors.
-  # FILL THIS IN.
+  if duration > 3:
+    print("FAILURE: The experiments ran in {} seconds.".format(duration))
+  else:
+    print("SUCCESS: The experiments ran in {} seconds.".format(duration))
