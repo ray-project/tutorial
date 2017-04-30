@@ -6,28 +6,44 @@ import numpy as np
 import ray
 import time
 
-# The goal of this exercise is to show how to use ray.wait to process tasks in
-# the order that they finish.
+# The goal of this exercise is to show how to create nested tasks by calling a
+# remote function inside of another remote function.
 
 if __name__ == "__main__":
-  ray.init(num_cpus=4, redirect_output=True)
+  ray.init(num_cpus=12, redirect_output=True)
+
+  # This is a function that represents some sort of experiment. It repeatedly
+  # calls the helper function, and some of the calls could be done in parallel.
+  #
+  # EXERCISE: Make helper a remote function so that the calls to helper can be
+  # done in parallel.
+  #
+  # LIMITATION: The definition of "helper" must come before the definition of
+  # "experiment" because as soon as experiment is defined, it will be pickled
+  # and shipped to the workers, and so if helper hasn't been defined yet, the
+  # definition will be incomplete.
+
+  def helper():
+    time.sleep(0.1)
+    return 1
 
   @ray.remote
-  def f():
-    time.sleep(np.random.uniform(0, 10))
-    return time.time()
+  def experiment():
+    results = []
+    for i in range(10):
+      results.append(sum([helper() for _ in range(5)]))
+    return results
 
   start_time = time.time()
 
-  result_ids = [f.remote() for _ in range(10)]
+  # Run two experiments in parallel.
+  experiment_id1 = experiment.remote()
+  experiment_id2 = experiment.remote()
 
-  # Get the results.
-  results = []
-  for result_id in result_ids:
-    result = ray.get(result_id)
-    results.append(result)
-    print("Processing result which finished after {} seconds."
-          .format(result - start_time))
+  ray.get([experiment_id1, experiment_id2])
 
-  assert results == sorted(results), ("The results were not processed in the "
-                                      "order that they finished.")
+  end_time = time.time()
+  duration = end_time - start_time
+
+  assert duration < 1.5, ("The experiments ran in {} seconds. This is too "
+                          "slow.".format(duration))
