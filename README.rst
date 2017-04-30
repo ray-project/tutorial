@@ -41,6 +41,9 @@ Setup
 Exercises
 ---------
 
+Each file ``exercises/exercise*.py`` is a separate exercise. Instructions are
+written in each file. Each file should run without raising any exceptions.
+
 **Exercise 1:** Define a remote function, and execute multiple remote functions
 in parallel.
 
@@ -67,3 +70,19 @@ set them in another actor.
 **Exercise 10:** Specify that an actor requires some GPUs.
 
 .. _`using actors`: http://ray.readthedocs.io/en/latest/actors.html
+
+
+Examples
+--------
+
+Now that you've completed the basic exercises, some more involved exercises are
+provided under ``examples/``.
+
+**Hyperparameter Search:** Implement a basic hyperparameter search scheme in
+which a new experiment is started every time one finishes.
+
+**Evolutionary Algorithms:** Implement an evolutionary algorithm for solving
+reinforcement learning problems.
+
+**Block Distributed Matrix Algorithms:** Implement a distributed matrix
+multiplication algorithm for block distributed matrices.
