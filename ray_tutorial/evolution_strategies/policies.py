@@ -134,6 +134,11 @@ class MujocoPolicy(Policy):
 
         self.nonlin = {'tanh': tf.tanh, 'relu': tf.nn.relu, 'lrelu': U.lrelu, 'elu': tf.nn.elu}[nonlin_type]
 
+        # The random integer appended to the scope name is a quick hack so that
+        # we can create multiple policies in the same graph without variable
+        # name collisions. Really we should just create the policies in
+        # separate graphs, but that doesn't play nicely with the current
+        # variable initialization scheme. TODO(rkn): Fix all of this.
         with tf.variable_scope(type(self).__name__ + str(np.random.randint(1000000000))) as scope:
             # Observation normalization
             ob_mean = tf.get_variable(
