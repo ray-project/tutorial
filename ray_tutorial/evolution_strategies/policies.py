@@ -134,7 +134,7 @@ class MujocoPolicy(Policy):
 
         self.nonlin = {'tanh': tf.tanh, 'relu': tf.nn.relu, 'lrelu': U.lrelu, 'elu': tf.nn.elu}[nonlin_type]
 
-        with tf.variable_scope(type(self).__name__) as scope:
+        with tf.variable_scope(type(self).__name__ + str(np.random.randint(1000000000))) as scope:
             # Observation normalization
             ob_mean = tf.get_variable(
                 'ob_mean', ob_space.shape, tf.float32, tf.constant_initializer(np.nan), trainable=False)
