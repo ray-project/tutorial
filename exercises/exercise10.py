@@ -1,92 +1,117 @@
+# The goal of this exercise is to develop some intuition for what kinds of
+# objects Ray can serialize and deserialize efficiently, and what kinds are
+# handled inefficiently.
+#
+# HIGH-LEVEL TAKEAWAY: Whenever possible, use numpy arrays.
+#
+# You can serialize a Python object and place it in the object store with
+# ray.put. You can then retrieve it and deserialize it with ray.get. This
+# should work out of the box with all primitive data types (e.g., ints, floats,
+# string, lists, tuples, dictionaries, and numpy arrays). However, an extra
+# line is needed to handle custom Python objects or more complex objects.
+#
+# For example, if you define a custom class, then in order to pass it to a
+# remote function, you need to call ray.register_class.
+#
+#     class Foo(object):
+#       def __init__(self, a, b):
+#         self.a = a
+#         self.b = b
+#
+#     ray.put(Foo(1, 2))  # This raises an exception.
+#
+#     ray.register_class(Foo)  # This tells Ray to serialize objects of type
+#                              # "Foo" by turning them into a dictionary of
+#                              # their fields, e.g., {"a": 1, "b": 2}.
+#     ray.get(ray.put(Foo(1, 2)))  # This should work.
+#
+# Not everything can be serialized by unpacking its fields into a dictionary,
+# so for those objects, we can fall back to pickle. E.g.,
+#
+#     ray.register_class(t, pickle=True)  # This tells Ray to serialize objects
+#                                         # of type t with pickle (actually we
+#                                         # use cloudpickle under the hood).
+#
+# NOTE: This is one of the uglier parts of the API. We can make more things
+# work out of the box by falling back to pickle, but the danger is that small
+# changs to application code could cause a change in the way serialization is
+# done (from our custom serialization using Apache Arrow to pickle), which
+# could lead to a big performance hit without any explanation.
+#
+# EXERCISE: See if you can make the following code run by calling
+# ray.register_class in the appropriate places. NOTE: It is probably simpler to
+# play around with this in an ipython interpreter than to repeatedly run this
+# script. Also, if you want to drop into an the interpreter in the middle of
+# this script, you can add the following lines.
+#
+#     import IPython
+#     IPython.embed()
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
 import numpy as np
 import ray
-import tensorflow as tf
 import time
 
-# The goal of this exercise is to show how to use GPUs with tasks and actors.
 
 if __name__ == "__main__":
-  # Start Ray, note that we pass in num_gpus=4. Ray will assume this machine
-  # has 4 GPUs (even if it does not). When a task or actor requests a GPU, it
-  # will be assigned a GPU ID from the set [0, 1, 2, 3]. It is then the
-  # responsibility of the task or actor to make sure that it only uses that
-  # specific GPU (e.g., by setting the CUDA_VISIBLE_DEVICES environment
-  # variable).
-  ray.init(num_cpus=4, num_gpus=4, redirect_output=True)
+  ray.init(num_cpus=4, redirect_output=True)
 
-  # This is a class with a simple neural net.
+  neural_net_weights = {"variable{}".format(i): np.random.normal(size=1000000)
+                        for i in range(50)}
+
+  # For fun, you may be interested in comparing the following times for
+  # different values of "neural_net_weights". This is best done in an ipython
+  # interpreter.
   #
-  # EXERCISE:
-  #   1. Modify this class to make it an actor.
-  #   2. Make the actor require a single GPU, and place the neural net on the
-  #      GPU. This should still work even if you run this on a machine with no
-  #      GPUs because we set allow_soft_placement=True below. To get this to
-  #      work on a machine with multiple GPUs, you will probably need to set
-  #      the environment variable CUDA_VISIBLE_DEVICES properly (before you
-  #      create the TensorFlow session object).
-  #   3. Create one actor for each GPU, and verify that they are placed on
-  #      different GPUs.
-  class Network(object):
-    def __init__(self, x, y):
-      with tf.device("/cpu:0"):
-        # NOTE: We create each network inside a separate graph. Doing this can
-        # be critical. In particular
-        with tf.Graph().as_default():
-          # Define the inputs.
-          x_data = tf.constant(x, dtype=tf.float32)
-          y_data = tf.constant(y, dtype=tf.float32)
-          # Define the weights and computation.
-          w = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
-          b = tf.Variable(tf.zeros([1]))
-          y = w * x_data + b
-          # Define the loss.
-          self.loss = tf.reduce_mean(tf.square(y - y_data))
-          optimizer = tf.train.GradientDescentOptimizer(0.5)
-          self.grads = optimizer.compute_gradients(self.loss)
-          self.train = optimizer.apply_gradients(self.grads)
-          # Define the weight initializer and session.
-          init = tf.global_variables_initializer()
-          # By setting allow_soft_placement=True, we allow this code to run
-          # even if the machine has no GPUs.
-          config = tf.ConfigProto(allow_soft_placement=True)
-          self.sess = tf.Session(config=config)
-          # Additional code for setting and getting the weights
-          self.variables = ray.experimental.TensorFlowVariables(self.loss,
-                                                                self.sess)
-          # Return all of the data needed to use the network.
-          self.sess.run(init)
+  #     %time x_id = ray.put(neural_net_weights)
+  #     %time x_val = ray.get(x_id)
+  #
+  #     import pickle
+  #     %time serialized = pickle.dumps(neural_net_weights)
+  #     %time deserialized = pickle.loads(serialized)
+  #
+  # Note that when you call ray.put, in addition to serializing the object, we
+  # are copying it into shared memory where it can be efficiently accessed by
+  # other workers on the same machine.
 
-    # Define a remote function that trains the network for one step and returns
-    # the new weights.
-    def step(self, weights):
-      # Set the weights in the network.
-      self.variables.set_weights(weights)
-      # Do one step of training. We only need the actual gradients so we filter
-      # over the list.
-      actual_grads = self.sess.run([grad[0] for grad in self.grads])
-      return actual_grads
+  class Foo(object):
+    def __init__(self, x):
+      self.x = x
 
-    def get_weights(self):
-      return self.variables.get_weights()
+  # By default, Ray doesn't know how to serialize Foo objects. Make this work.
+  result = ray.get(ray.put(Foo(1)))
+  assert result.x == 1
 
-  num_data = 1000
-  x_data = np.random.rand(num_data)
-  y_data = x_data * 0.1 + 0.3
+  class Bar(object):
+    def __init__(self, a, b):
+      self.a = a
+      self.b = b
+      self.c = np.ones((a, b))
 
-  # EXERCISE: Note that when you make Network an actor and you pass x_data and
-  # y_data (which are both numpy arrays) into the Network constructor, every
-  # time you create a new Network actor, x_data and y_data will be serialized
-  # and put in the object store. In order to place them in the object store
-  # only once, you can use call ray.put on the objects and pass the resulting
-  # object IDs into the Network constructor.
-  actors = [Network(x_data, y_data) for _ in range(4)]
+  class Qux(object):
+    def __init__(self, a, b):
+      self.bar = Bar(a, b)
 
-  # Get the weights of the first actor.
-  weights = actors[0].get_weights()
+  # By default, Ray doesn't know how to serialize Qux objects. Make the line
+  # below work. NOTE: if Ray falls back to pickling the Qux object, then Ray
+  # will not be able to efficiently handle the large numpy array inside.
+  # Compare the performance difference with and without pickling.
+  result = ray.get(ray.put(Qux(1000, 10000)))
+  assert result.bar.a == 1000
+  assert result.bar.b == 10000
+  assert np.alltrue(result.bar.c, np.ones((1000, 10000)))
 
-  # Do a training step on each actor.
-  [actor.step(weights) for actor in actors]
+  @ray.remote
+  def f(x):
+    return x
+
+  # Our approach to serialization currently does not work with recursive
+  # objects. Find a workaround for the following example, which is a list that
+  # recursively contains itself (you may modify f to make this work).
+  l = []
+  l.append(l)
+  result = ray.get(f.remote(l))
+  assert result == result[0]

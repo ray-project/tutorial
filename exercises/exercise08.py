@@ -1,82 +1,47 @@
+# The goal of this exercise is to illustrate how to use actors to avoid
+# expensive initializations.
+#
+# EXERCISE: Avoid the overhead of constantly recreating the "Foo" object inside
+# of the remote function by using actors.
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
 import numpy as np
 import ray
-import tensorflow as tf
 import time
-
-from ray_tutorial.reinforce.env import BatchedEnv
-from ray_tutorial.reinforce.policy import ProximalPolicyLoss
-from ray_tutorial.reinforce.filter import MeanStdFilter
-from ray_tutorial.reinforce.rollout import rollouts, add_advantage_values
-
-from ray_tutorial.reinforce.env import (NoPreprocessor, AtariRamPreprocessor,
-                                        AtariPixelPreprocessor)
-from ray_tutorial.reinforce.models.fc_net import fc_net
-from ray_tutorial.reinforce.models.vision_net import vision_net
-
-# The goal of this exercise is to show how to use actors. In this exercise, we
-# define a remote function which creates a neural network and a gym
-# environment and uses the network to do a rollout in the environment. However,
-# every time a rollout is done, a new network is created. If the network
-# creation is expensive (e.g., the network is placed on a GPU), then this will
-# be slow.
-
-config = {"kl_coeff": 0.2,
-          "num_sgd_iter": 30,
-          "sgd_stepsize": 5e-5,
-          "sgd_batchsize": 128,
-          "entropy_coeff": 0.0,
-          "clip_param": 0.3,
-          "kl_target": 0.01,
-          "timesteps_per_batch": 40000}
 
 
 if __name__ == "__main__":
-  # Tell Ray to serialize objects of these types using pickle.
-  ray.register_class(NoPreprocessor, pickle=True)
-  ray.register_class(AtariRamPreprocessor, pickle=True)
-  ray.register_class(AtariPixelPreprocessor, pickle=True)
-
   ray.init(num_cpus=4, redirect_output=True)
 
-  # This remote function creates a neural net and a gym environment and does a
-  # rollout. A new network is created every time this remote function is
-  # called.
-  #
-  # Exercise: Change this remote function to be a method of an actor so that
-  # the neural net and the gym environment are only created once in the actor's
-  # constructor.
+  class Foo(object):
+    def __init__(self):
+      # This class takes a long time to initialize. For example, maybe it
+      # constructs a neural net and places the neural net on a GPU.
+      time.sleep(1)
+
+    def do_something(self):
+      # However, the class can be used very quickly.
+      time.sleep(0.1)
+      return 1
+
+  # Here, we define a remote function that creates a Foo object and uses it to
+  # do something simple. There's no good reason to repeatedly recreate the Foo
+  # object.
   @ray.remote
-  def rollout(name, batchsize, preprocessor, config, gamma, lam, horizon):
-    # Initialize the network and the environment.
-    env = BatchedEnv(name, batchsize, preprocessor=preprocessor)
-    if preprocessor.shape is None:
-      preprocessor.shape = env.observation_space.shape
-    # Note that we create the neural net inside its own graph. This can be
-    # important because we will call this rollout function multiple times, and
-    # some of the tasks will be scheduled on the same workers. This will result
-    # in the graph being created multiple times on the same worker, and there
-    # can be collisions in the variable names.
-    with tf.Graph().as_default():
-      sess = tf.Session()
-      policy = ProximalPolicyLoss(env.observation_space, env.action_space, preprocessor, config, sess)
-      # optimizer = tf.train.AdamOptimizer(config["sgd_stepsize"])
-      # train_op = optimizer.minimize(policy.loss)
-      # variables = ray.experimental.TensorFlowVariables(policy.loss, sess)
-      observation_filter = MeanStdFilter(preprocessor.shape, clip=None)
-      reward_filter = MeanStdFilter((), clip=5.0)
-      sess.run(tf.global_variables_initializer())
+  def do_something():
+    f = Foo()
+    return f.do_something()
 
-    # Collect some rollouts.
-    trajectory = rollouts(policy, env, horizon, observation_filter, reward_filter)
-    add_advantage_values(trajectory, gamma, lam, reward_filter)
+  start_time = time.time()
 
-    return trajectory
+  results = ray.get([do_something.remote() for _ in range(16)])
 
-  # Do some rollouts in parallel.
-  rollout_ids = [rollout.remote("Pong-v0", 1, AtariPixelPreprocessor(), config, 0.995, 1.0, 2000)
-                 for _ in range(8)]
-  rollouts = ray.get(rollout_ids)
+  end_time = time.time()
+  duration = end_time - start_time
+
+  assert results == 16 * [1]
+  assert duration < 2, ("The experiments ran in {} seconds. This is too "
+                        "slow.".format(duration))

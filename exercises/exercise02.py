@@ -1,3 +1,12 @@
+# The goal of this exercise is to show how to pass object IDs into remote
+# functions to encode dependencies between tasks. In this case, we construct a
+# sequence of tasks, each of which depends on the previous. Within each
+# sequence, tasks are executed serially, but multiple sequences can be executed
+# in parallel.
+#
+# EXERCISE: This script is too slow, use Ray to parallelize the computation
+# below.
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -6,41 +15,33 @@ import numpy as np
 import ray
 import time
 
-# The goal of this exercise is to show how to pass object IDs into remote
-# functions to encode dependencies between tasks.
 
 if __name__ == "__main__":
   ray.init(num_cpus=4, redirect_output=True)
 
-  @ray.remote
-  def create_data():
-    return np.ones(10000)
-
-  # This is a proxy for an expensive aggregation step (which is also
-  # commutative and associative so it should be used in a tree-reduce).
-  def aggregate_data(x, y):
-    time.sleep(0.5)
-    return x + y
-
-  vector_ids = [create_data.remote() for _ in range(8)]
+  # This function is a proxy for a more interesting and computationally
+  # intensive function.
+  def slow_function(i):
+    time.sleep(np.random.uniform(0, 0.1))
+    return i + 1
 
   start_time = time.time()
 
-  # Here we aggregate all of the data by getting it on the driver and then
-  # repeatedly calling aggregate_data. However, this could be done faster by
-  # making aggregate_data a remote function and aggregating the data in a
-  # tree-like fashion.
-  vectors = ray.get(vector_ids)
-  result = vectors[0]
-  for vector in vectors[1:]:
-    result = aggregate_data(result, vector)
+  # This loop is too slow. Some of the calls to slow_function should happen in
+  # parallel. However, they cannot all happen in parallel, because some of them
+  # calls use the outputs of other calls. The underlying computation graph
+  # encoding the dependencies between these tasks consists of four chains of
+  # length twenty.
+  results = []
+  for i in range(4):
+    x = 100 * i
+    for j in range(20):
+      x = slow_function(x)
+    results.append(x)
 
   end_time = time.time()
   duration = end_time - start_time
 
-  if duration < 3.5 / 2:
-    print("SUCCESS: The results were aggregated in {} seconds."
-          .format(duration))
-  else:
-    print("FAILURE: The results were aggregated in {} seconds."
-          .format(duration))
+  assert results == [20, 120, 220, 320]
+  assert duration < 1.1, ("The loop took {} seconds. This is too slow."
+                          .format(duration))
