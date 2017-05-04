@@ -145,7 +145,7 @@ if __name__ == "__main__":
   env_name = "Pendulum-v0"
   stepsize = 0.01
 
-  ray.init()
+  ray.init(redirect_output=True)
 
   # Tell Ray to serialize Config and Result objects.
   ray.register_class(Config)

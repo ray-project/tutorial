@@ -94,10 +94,13 @@ Now that you've completed the basic exercises, some more involved exercises are
 provided under ``examples/``.
 
 **Block Distributed Matrix Algorithms:** Implement a distributed matrix
-multiplication algorithm for block distributed matrices.
+multiplication algorithm for block distributed matrices. For this example, run
+``python examples/block_linear_algebra.py``.
 
 **Hyperparameter Search:** Implement a basic hyperparameter search scheme in
-which a new experiment is started every time one finishes.
+which a new experiment is started every time one finishes. For this example, run
+``python examples/hyperparameter_search.py``.
 
 **Evolutionary Algorithms:** Implement an evolutionary algorithm for solving
-reinforcement learning problems.
+reinforcement learning problems. For this example, run
+``python examples/evolution_strategies.py``.
