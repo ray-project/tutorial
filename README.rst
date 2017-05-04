@@ -97,10 +97,12 @@ provided under ``examples/``.
 multiplication algorithm for block distributed matrices. For this example, run
 ``python examples/block_linear_algebra.py``.
 
-**Hyperparameter Search:** Implement a basic hyperparameter search scheme in
-which a new experiment is started every time one finishes. For this example, run
-``python examples/hyperparameter_search.py``.
+**Hyperparameter Search:** Here, a serial implementation of random
+hyperparameter search is provided. Modify this example to parallelize the
+hyperparameter search and to start a new experiment whenever one finishes. For
+this example, run ``python examples/hyperparameter_search.py``.
 
-**Evolutionary Algorithms:** Implement an evolutionary algorithm for solving
-reinforcement learning problems. For this example, run
+**Evolutionary Algorithms:** Here, a serial implementation of an evolutionary
+algorithm for solving reinforcement learning problems is provided. Modify this
+example to parallelize the implementation. For this example, run
 ``python examples/evolution_strategies.py``.
