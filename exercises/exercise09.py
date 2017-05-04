@@ -1,74 +1,80 @@
+# The goal of this exercise is to illustrate how to speed up serialization by
+# using ray.put.
+#
+# When objects are passed into a remote function, we put them in the object
+# store under the hood. That is, if "f" is a remote function, the code
+#
+#    x = np.zeros(1000)
+#    f.remote(x)
+#
+# is essentially transformed under the hood to
+#
+#    x = np.zeros(1000)
+#    x_id = ray.put(x)
+#    f.remote(x_id)
+#
+# The call to ray.put copies the numpy array into the shared-memory object
+# store, from where it can be read by all of the worker processes (without
+# additional copying). However, if you do something like
+#
+#     for i in range(10):
+#       f.remote(x)
+#
+# then 10 copies of the array will be placed into the object store. This takes
+# up more memory in the object store than is necessary, and it also takes time
+# to copy the array into the object store over and over. This can be made more
+# efficient by placing the array in the object store only once as follows.
+#
+#     x_id = ray.put(x)
+#     for i in range(10):
+#       f.remote(x_id)
+#
+# EXERCISE: Speed up the code below and reduce the memory footprint by calling
+# ray.put on the neural net weights before passing them into the remote
+# functions.
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
 import numpy as np
 import ray
-import tensorflow as tf
 import time
-
-from ray_tutorial.reinforce.env import BatchedEnv
-from ray_tutorial.reinforce.policy import ProximalPolicyLoss
-from ray_tutorial.reinforce.filter import MeanStdFilter
-from ray_tutorial.reinforce.rollout import rollouts, add_advantage_values
-
-from ray_tutorial.reinforce.env import (NoPreprocessor, AtariRamPreprocessor,
-                                        AtariPixelPreprocessor)
-from ray_tutorial.reinforce.models.fc_net import fc_net
-from ray_tutorial.reinforce.models.vision_net import vision_net
-
-# The goal of this exercise is to show how to use send neural network weights
-# between workers and the driver. Since, pickling and unpickling a TensorFlow
-# graph can be inefficient or may not work at all, it is most efficient to ship
-# the weights between processes as a dictionary of numpy arrays. We use the
-# helper class ray.experimental.TensorFlowVariables to help with this. Similar
-# techniques should work other neural net libraries.
 
 
 if __name__ == "__main__":
-  ray.init(num_cpus=4, redirect_output=True)
+  ray.init(num_cpus=20, redirect_output=True)
 
-  # This actor contains a simple neural network.
+  neural_net_weights = {"variable{}".format(i): np.random.normal(size=1000000)
+                        for i in range(50)}
+
+  # For fun, you may be interested in comparing the following times, for
+  # different values of "neural_net_weights". This is best done in an ipython
+  # interpreter.
   #
-  # Exercise: Implement the set_weights and get_weights methods so that the
-  # driver can retrieve the weights from the actor and set new weights on the
-  # actor.
-  @ray.actor
-  class SimpleModel(object):
-    def __init__(self):
-      x_data = tf.placeholder(tf.float32, shape=[100])
-      y_data = tf.placeholder(tf.float32, shape=[100])
+  #     %time x_id = ray.put(neural_net_weights)
+  #     %time x_val = ray.get(x_id)
+  #
+  #     import pickle
+  #     %time serialized = pickle.dumps(neural_net_weights)
+  #     %time deserialized = pickle.loads(serialized)
+  #
+  # Note that when you call ray.put, in addition to serializing the object, we
+  # are copying it into shared memory where it can be efficiently accessed by
+  # other workers on the same machine.
 
-      w = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
-      b = tf.Variable(tf.zeros([1]))
-      y = w * x_data + b
+  @ray.remote
+  def use_weights(weights, i):
+    return i
 
-      self.loss = tf.reduce_mean(tf.square(y - y_data))
-      optimizer = tf.train.GradientDescentOptimizer(0.5)
-      grads = optimizer.compute_gradients(loss)
-      self.train = optimizer.apply_gradients(grads)
+  start_time = time.time()
 
-      init = tf.global_variables_initializer()
-      self.sess = tf.Session()
+  results = ray.get([use_weights.remote(neural_net_weights, i)
+                     for i in range(20)])
 
-      self.sess.run(init)
+  end_time = time.time()
+  duration = end_time - start_time
 
-    def set_weights(self, weights):
-      # Exercise: Implement this.
-      pass
-
-    def get_weights(self):
-      # Exercise: Implement this.
-      pass
-
-  # Create a few actors with the model.
-  actors = [SimpleModel() for _ in range(4)]
-
-  # EXERCISE: Get the weights from the actors.
-  # FILL THIS IN.
-
-  # EXERCISE: Average the weights.
-  # FILL THIS IN.
-
-  # EXERCISE: Set the average weights on the actors.
-  # FILL THIS IN.
+  assert results == list(range(20))
+  assert duration < 1, ("The experiments ran in {} seconds. This is too "
+                        "slow.".format(duration))

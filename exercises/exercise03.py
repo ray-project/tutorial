@@ -1,3 +1,11 @@
+# Like the previous exercise, the goal of this exercise is to show how to pass
+# object IDs into remote functions to encode dependencies between tasks. The
+# code in this example generates a handful of arrays and then aggregates them
+# in a tree-like pattern.
+#
+# EXERCISE: This script is too slow, use Ray to parallelize the computation
+# below.
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -6,44 +14,43 @@ import numpy as np
 import ray
 import time
 
-# The goal of this exercise is to show how to create nested tasks by calling a
-# remote function inside of another remote function.
 
 if __name__ == "__main__":
-  ray.init(num_cpus=12, redirect_output=True)
+  ray.init(num_cpus=8, redirect_output=True)
 
-  # This is a function that represents some sort of experiment. It repeatedly
-  # calls the helper function, and some of the calls could be done in parallel.
-  #
-  # EXERCISE: Make helper a remote function so that the calls to helper can be
-  # done in parallel.
-  #
-  # LIMITATION: The definition of "helper" must come before the definition of
-  # "experiment" because as soon as experiment is defined, it will be pickled
-  # and shipped to the workers, and so if helper hasn't been defined yet, the
-  # definition will be incomplete.
-
-  def helper():
+  # This is a proxy for a function which generates some data.
+  def create_data():
     time.sleep(0.1)
-    return 1
+    return np.ones(10000)
 
-  @ray.remote
-  def experiment():
-    results = []
-    for i in range(10):
-      results.append(sum([helper() for _ in range(5)]))
-    return results
+  # This is a proxy for an expensive aggregation step (which is also
+  # commutative and associative so it can be used in a tree-reduce).
+  def aggregate_data(x, y):
+    time.sleep(0.5)
+    return x + y
 
   start_time = time.time()
 
-  # Run two experiments in parallel.
-  experiment_id1 = experiment.remote()
-  experiment_id2 = experiment.remote()
+  # Here we generate some data. This could be done in parallel.
+  vectors = [create_data() for _ in range(8)]
 
-  ray.get([experiment_id1, experiment_id2])
+  # Here we aggregate all of the data by getting it on the driver and then
+  # repeatedly calling aggregate_data. However, this could be done faster by
+  # making aggregate_data a remote function and aggregating the data in a
+  # tree-like fashion.
+  #
+  # NOTE: A direct translation of the code below to use Ray will not result in
+  # a speedup because the underlying graph of dependencies between the tasks is
+  # essentially linear. There are a handful of ways to do this, and the
+  # aggregation can actually be done cleverly in a single line.
+  result = vectors[0]
+  for vector in vectors[1:]:
+    result = aggregate_data(result, vector)
 
   end_time = time.time()
   duration = end_time - start_time
 
-  assert duration < 1.5, ("The experiments ran in {} seconds. This is too "
-                          "slow.".format(duration))
+  assert np.sum(result) == 10000 * 8
+  assert duration < 0.1 + 1.5 + 0.1, ("FAILURE: The data generation and "
+                                      "aggregation took {} seconds. This is "
+                                      "too slow".format(duration))
