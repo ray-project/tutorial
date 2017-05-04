@@ -1,3 +1,19 @@
+# In this example, we will take a random hyperparameter optimization
+# implementation and parallelize it.
+#
+# EXERCISE: Make train_cnn_and_compute_accuracy a remote function and train
+# multiple models in parallel.
+#
+# EXERCISE: Make sure that you pass in object IDs for the data arguments
+# (instead of numpy arrays) to train_cnn_and_compute_accuracy so that you avoid
+# putting the data in the object store multiple times.
+#
+# EXERCISE: Using ray.wait, whenever one experiment finishes, print its
+# accuracy and start a new experiment.
+#
+# EXERCISE: Use ray.experimental.TensorFlowVariables to extract the weights
+# after training and return the weights from the remote function.
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -24,18 +40,6 @@ def get_batch(data, batch_index, batch_size):
 # argument, constructs a neural network using those hyperparameters, trains the
 # neural net, measures the validation accuracy, and returns the validation
 # accuracy.
-#
-# EXERCISE: Make this a remote function and train multiple models in parallel.
-#
-# EXERCISE: Make sure that you pass in object IDs for the data arguments
-# (instead of numpy arrays) so that you avoid putting the data in the object
-# store multiple times.
-#
-# EXERCISE: Using ray.wait, whenever one experiment finishes, print its
-# accuracy and start a new experiment.
-#
-# EXERCISE: Use ray.experimental.TensorFlowVariables to extract the weights
-# after training and return the weights from the remote function.
 def train_cnn_and_compute_accuracy(params, steps, train_images, train_labels,
                                    validation_images, validation_labels):
   # Extract the hyperparameters from the params dictionary.
@@ -73,7 +77,7 @@ def train_cnn_and_compute_accuracy(params, steps, train_images, train_labels,
 
 
 if __name__ == "__main__":
-  ray.init()
+  ray.init(redirect_output=True)
 
   # The number of sets of random hyperparameters to try.
   trials = 5
