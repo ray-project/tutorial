@@ -17,7 +17,7 @@ import time
 
 
 if __name__ == "__main__":
-  ray.init(num_cpus=15, redirect_output=True)
+  ray.init(num_cpus=20, redirect_output=True)
 
   @ray.remote
   def f(i):
@@ -52,10 +52,10 @@ if __name__ == "__main__":
 
   assert set(initial_indices + remaining_indices) == set(range(20))
 
-  assert duration < 2.75, ("The initial batch of ten tasks was retrieved in "
-                           "{} seconds. That's too slow.".format(duration))
+  assert duration < 3, ("The initial batch of ten tasks was retrieved in "
+                        "{} seconds. That's too slow.".format(duration))
 
   # Make sure the initial results actually completed first.
   for x in initial_times:
     for y in remaining_times:
-      assert x < y
+      assert x < y, "{} is larger than {}".format(x, y)
