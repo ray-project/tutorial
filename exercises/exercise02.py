@@ -43,5 +43,5 @@ if __name__ == "__main__":
   duration = end_time - start_time
 
   assert results == [20, 120, 220, 320]
-  assert duration < 1.1, ("The loop took {} seconds. This is too slow."
+  assert duration < 1.3, ("The loop took {} seconds. This is too slow."
                           .format(duration))
