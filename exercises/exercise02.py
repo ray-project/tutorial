@@ -25,6 +25,8 @@ if __name__ == "__main__":
     time.sleep(np.random.uniform(0, 0.1))
     return i + 1
 
+  # Sleep a little to improve the accuracy of the timing measurements below.
+  time.sleep(0.5)
   start_time = time.time()
 
   # This loop is too slow. Some of the calls to slow_function should happen in
@@ -43,5 +45,5 @@ if __name__ == "__main__":
   duration = end_time - start_time
 
   assert results == [20, 120, 220, 320]
-  assert duration < 1.1, ("The loop took {} seconds. This is too slow."
+  assert duration < 1.3, ("The loop took {} seconds. This is too slow."
                           .format(duration))

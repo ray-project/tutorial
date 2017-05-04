@@ -67,6 +67,8 @@ if __name__ == "__main__":
   def use_weights(weights, i):
     return i
 
+  # Sleep a little to improve the accuracy of the timing measurements below.
+  time.sleep(0.5)
   start_time = time.time()
 
   results = ray.get([use_weights.remote(neural_net_weights, i)
