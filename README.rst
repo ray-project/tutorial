@@ -43,6 +43,7 @@ Exercises
 
 Each file ``exercises/exercise*.py`` is a separate exercise. Instructions are
 written in each file. Each file should run without raising any exceptions.
+Throughout these exercises, you may find the `Ray documentation`_ helpful.
 
 **Exercise 1:** Define a remote function, and execute multiple remote functions
 in parallel.
@@ -80,6 +81,7 @@ and set them in another actor. You may want to read the documentation on
 **Exercise 13:** Specify that an actor requires some GPUs. For a complete
 example that does something similar, you may want to see the `ResNet example`_.
 
+.. _`Ray documentation`: http://ray.readthedocs.io/en/latest/?badge=latest
 .. _`using actors`: http://ray.readthedocs.io/en/latest/actors.html
 .. _`using Ray with TensorFlow`: http://ray.readthedocs.io/en/latest/using-ray-with-tensorflow.html
 .. _`ResNet example`: http://ray.readthedocs.io/en/latest/example-resnet.html
