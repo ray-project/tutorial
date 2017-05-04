@@ -56,6 +56,4 @@ if __name__ == "__main__":
                         "{} seconds. That's too slow.".format(duration))
 
   # Make sure the initial results actually completed first.
-  for x in initial_times:
-    for y in remaining_times:
-      assert x < y, "{} is larger than {}".format(x, y)
+  assert max(initial_times) < min(remaining_times)
