@@ -1,3 +1,27 @@
+# The goal of this exercise is to show how to use GPUs with actors.
+#
+# We can indicate that an actor requires a single GPU as follows.
+#
+#     @ray.actor(num_gpus=1)
+#     class Foo(object):
+#       pass
+#
+# Then inside of the actor constructor and methods, we can get the IDs of the
+# GPUs allocated for that actor with ray.get_gpu_ids().
+#
+# EXERCISE: Modify this class to make it an actor.
+#
+# EXERCISE: Make the actor require a single GPU, and place the neural net on
+# the GPU. This should still work even if you run this on a machine with no
+# GPUs because we set allow_soft_placement=True below. To get this to work on a
+# machine with multiple GPUs, you will probably need to set the environment
+# variable CUDA_VISIBLE_DEVICES properly from within Python (before you create
+# the TensorFlow session object).
+#
+# EXERCISE: Create one actor for each GPU, and verify that they are placed on
+# different GPUs.
+
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -7,7 +31,6 @@ import ray
 import tensorflow as tf
 import time
 
-# The goal of this exercise is to show how to use GPUs with tasks and actors.
 
 if __name__ == "__main__":
   # Start Ray, note that we pass in num_gpus=4. Ray will assume this machine
@@ -18,23 +41,17 @@ if __name__ == "__main__":
   # variable).
   ray.init(num_cpus=4, num_gpus=4, redirect_output=True)
 
-  # This is a class with a simple neural net.
-  #
-  # EXERCISE:
-  #   1. Modify this class to make it an actor.
-  #   2. Make the actor require a single GPU, and place the neural net on the
-  #      GPU. This should still work even if you run this on a machine with no
-  #      GPUs because we set allow_soft_placement=True below. To get this to
-  #      work on a machine with multiple GPUs, you will probably need to set
-  #      the environment variable CUDA_VISIBLE_DEVICES properly (before you
-  #      create the TensorFlow session object).
-  #   3. Create one actor for each GPU, and verify that they are placed on
-  #      different GPUs.
+  # This is a class with a simple neural net. Make this an actor and make it
+  # require a single GPU.
   class Network(object):
     def __init__(self, x, y):
+      # You should be able to access the GPU IDs in here, and set
+      # CUDA_VISIBLE_DEVICES appropriately to control which GPUs TensorFlow
+      # uses.
+      assert len(ray.get_gpu_ids()) == 1
       with tf.device("/cpu:0"):
         # NOTE: We create each network inside a separate graph. Doing this can
-        # be critical. In particular
+        # be critical for avoiding variable name collisions.
         with tf.Graph().as_default():
           # Define the inputs.
           x_data = tf.constant(x, dtype=tf.float32)
@@ -73,6 +90,9 @@ if __name__ == "__main__":
     def get_weights(self):
       return self.variables.get_weights()
 
+    def get_gpu_ids(self):
+      return ray.get_gpu_ids()
+
   num_data = 1000
   x_data = np.random.rand(num_data)
   y_data = x_data * 0.1 + 0.3
@@ -90,3 +110,9 @@ if __name__ == "__main__":
 
   # Do a training step on each actor.
   [actor.step(weights) for actor in actors]
+
+  # Check that the GPU IDs are different.
+  gpu_ids = []
+  for actor in actors:
+    gpu_ids += actor.get_gpu_ids()
+  assert set(gpu_ids) == set(range(4))

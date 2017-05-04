@@ -1,8 +1,18 @@
+# The goal of this exercise is to combine a handful of lessons in a single
+# example and to get some practice parallelizing serial code. In this exercise,
+# we create a neural network and a gym environment and use the network to do
+# some rollouts (that is, we use the neural net to choose actions to take in
+# the environment). However, all of the rollouts are done serially.
+#
+# EXERCISE: Change this code to do rollouts in parallel. To avoid recreating
+# the neural net over and over, you may want to use actors.
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import psutil
 import ray
 import tensorflow as tf
 import time
@@ -17,12 +27,6 @@ from ray_tutorial.reinforce.env import (NoPreprocessor, AtariRamPreprocessor,
 from ray_tutorial.reinforce.models.fc_net import fc_net
 from ray_tutorial.reinforce.models.vision_net import vision_net
 
-# The goal of this exercise is to show how to use actors. In this exercise, we
-# define a remote function which creates a neural network and a gym environment
-# and uses the network to do a rollout in the environment. However, every time
-# a rollout is done, a new network is created. If the network creation is
-# expensive (e.g., the network is placed on a GPU), then this will be slow.
-
 config = {"kl_coeff": 0.2,
           "num_sgd_iter": 30,
           "sgd_stepsize": 5e-5,
@@ -34,48 +38,57 @@ config = {"kl_coeff": 0.2,
 
 
 if __name__ == "__main__":
-  # Tell Ray to serialize objects of these types using pickle.
-  ray.register_class(NoPreprocessor, pickle=True)
-  ray.register_class(AtariRamPreprocessor, pickle=True)
-  ray.register_class(AtariPixelPreprocessor, pickle=True)
-
   ray.init(num_cpus=4, redirect_output=True)
 
-  # This remote function creates a neural net and a gym environment and does a
-  # rollout. A new network is created every time this remote function is
-  # called.
+  # For a more interesting example, try this with the following values. Note
+  # that this will require installing gym with the atari environments. You'll
+  # probably want to use a smaller batchsize for this.
   #
-  # Exercise: Change this remote function to be a method of an actor so that
-  # the neural net and the gym environment are only created once in the actor's
-  # constructor.
-  @ray.remote
-  def rollout(name, batchsize, preprocessor, config, gamma, lam, horizon):
-    # Initialize the network and the environment.
-    env = BatchedEnv(name, batchsize, preprocessor=preprocessor)
+  #     name = "Pong-v0"
+  #     preprocessor = AtariPixelPreprocessor()
+
+  name = "CartPole-v0"
+  batchsize = 100
+  preprocessor = NoPreprocessor()
+  gamma = 0.995
+  lam = 1.0
+  horizon = 2000
+
+  # Create a simulator environment. This is a wrapper containing a batch of gym
+  # environments. The simulator can be simulated with "env.step(action)", which
+  # is called within the "rollouts" function below.
+  env = BatchedEnv(name, batchsize, preprocessor=preprocessor)
+
+  # Create a neural net policy. Note that we create the neural net inside its
+  # own graph. This can help avoid variable name collisions. It shouldn't
+  # matter in this example, but if you create a neural net inside of a remote
+  # function, and multiple tasks execute that remote function on the same
+  # worker, then this can lead to variable name collisions.
+  with tf.Graph().as_default():
+    sess = tf.Session()
     if preprocessor.shape is None:
       preprocessor.shape = env.observation_space.shape
-    # Note that we create the neural net inside its own graph. This can be
-    # important because we will call this rollout function multiple times, and
-    # some of the tasks will be scheduled on the same workers. This will result
-    # in the graph being created multiple times on the same worker, and there
-    # can be collisions in the variable names.
-    with tf.Graph().as_default():
-      sess = tf.Session()
-      policy = ProximalPolicyLoss(env.observation_space, env.action_space, preprocessor, config, sess)
-      # optimizer = tf.train.AdamOptimizer(config["sgd_stepsize"])
-      # train_op = optimizer.minimize(policy.loss)
-      # variables = ray.experimental.TensorFlowVariables(policy.loss, sess)
-      observation_filter = MeanStdFilter(preprocessor.shape, clip=None)
-      reward_filter = MeanStdFilter((), clip=5.0)
-      sess.run(tf.global_variables_initializer())
+    policy = ProximalPolicyLoss(env.observation_space, env.action_space,
+                                preprocessor, config, sess)
+    observation_filter = MeanStdFilter(preprocessor.shape, clip=None)
+    reward_filter = MeanStdFilter((), clip=None)
+    sess.run(tf.global_variables_initializer())
 
+  def rollout():
     # Collect some rollouts.
-    trajectory = rollouts(policy, env, horizon, observation_filter, reward_filter)
+    trajectory = rollouts(policy, env, horizon, observation_filter,
+                          reward_filter)
     add_advantage_values(trajectory, gamma, lam, reward_filter)
-
     return trajectory
 
-  # Do some rollouts in parallel.
-  rollout_ids = [rollout.remote("CartPole-v0", 1, AtariPixelPreprocessor(), config, 0.995, 1.0, 2000)
-                 for _ in range(8)]
-  rollouts = ray.get(rollout_ids)
+  start_time = time.time()
+
+  # Do some rollouts serially. These should be done in parallel.
+  rollouts = [rollout() for _ in range(20)]
+
+  end_time = time.time()
+  duration = end_time - start_time
+
+  expected_duration = np.ceil(20 / psutil.cpu_count()) * 0.5
+  assert duration < expected_duration, ("Rollouts took {} seconds."
+                                        .format(duration))

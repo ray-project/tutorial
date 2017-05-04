@@ -70,14 +70,19 @@ object into shared memory multiple times.
 **Exercise 10:** Use ``ray.register_class`` to enable Ray to serialize custom
 classes.
 
-**Exercise 11:** Create a neural network inside of an actor.
+**Exercise 11:** Parallelize a serial example that uses a neural net to perform
+rollouts in a gym environment.
 
 **Exercise 12:** Extract neural network weights from an actor on one process,
-and set them in another actor.
+and set them in another actor. You may want to read the documentation on
+`using Ray with TensorFlow`_.
 
-**Exercise 13:** Specify that an actor requires some GPUs.
+**Exercise 13:** Specify that an actor requires some GPUs. For a complete
+example that does something similar, you may want to see the `ResNet example`_.
 
 .. _`using actors`: http://ray.readthedocs.io/en/latest/actors.html
+.. _`using Ray with TensorFlow`: http://ray.readthedocs.io/en/latest/using-ray-with-tensorflow.html
+.. _`ResNet example`: http://ray.readthedocs.io/en/latest/example-resnet.html
 
 
 Longer Examples
