@@ -1,11 +1,45 @@
 # Code in this file is copied and adapted from
 # https://github.com/openai/evolution-strategies-starter.
+#
+# This code creates a set of "Worker" objects with
+#
+#       workers = [Worker(...) for _ in range(num_workers)]
+#
+# It then enters an infinite loop which alternates between doing rollouts with
+#
+#     results = [worker.do_rollouts(...) for worker in workers]
+#
+# and updating the policy with
+#
+#     optimizer.update(...)
+#
+# where the update to the policy is computed using "results".
+#
+# EXERCISE: Make the "Worker" objects actors so that they are started as new
+# processes.
+#
+# EXERCISE: Do the rollouts in parallel to speed up the computation. Note that
+# we are currently only starting two workers, so the opportunity for
+# parallelism will depend on the number of workers.
+#
+# EXERCISE: You will probably need to tell Ray how to serialize Config and
+# Result objects using "ray.register_class".
+#
+# EXERCISE: This code uses a large numpy array of noise that is shared between
+# the workers. This array is created by the function "create_shared_noise".
+# Make "create_shared_noise" a remote function so that the noise object is put
+# in shared memory and shared between all of the worker processes (so each
+# worker does not create its own copy of the array). Note that the array of
+# noise is fairly large and takes a little while to create.
+#
+# Note, the code in this example was tuned for the Humanoid-v1 gym environment.
+# Here we're running it on Pendulum-v0 for simplicity, but it works best on
+# the Humanoid environment.
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import argparse
 from collections import namedtuple
 import gym
 import numpy as np
@@ -15,13 +49,6 @@ import time
 
 from ray_tutorial.evolution_strategies import (optimizers, policies,
                                                tabular_logger, tf_util, utils)
-
-
-# EXERCISE: Make the "Worker" objects actors so that they are started as new
-# processes.
-#
-# EXERCISE: Put the numpy array that is used in the SharedNoiseTable in the
-# object store so that each process does not create its own copy of the array.
 
 
 Config = namedtuple("Config", [
@@ -39,8 +66,7 @@ Result = namedtuple("Result", [
 def create_shared_noise():
   """Create a large array of noise to be shared by all workers."""
   seed = 123
-  count = 250000
-  #count = 250000000
+  count = 250000000
   noise = np.random.RandomState(seed).randn(count).astype(np.float32)
   return noise
 
@@ -66,13 +92,11 @@ class Worker(object):
     self.noise = SharedNoiseTable(noise)
 
     self.env = gym.make(env_name)
-    #with tf.Graph().as_default():
     self.sess = utils.make_session(single_threaded=True)
     self.policy = policies.MujocoPolicy(self.env.observation_space,
                                         self.env.action_space,
                                         **policy_params)
     tf_util.initialize()
-    #self.sess.run(tf.global_variables_initializer())
 
     self.rs = np.random.RandomState()
 
@@ -103,7 +127,6 @@ class Worker(object):
             "order to evaluate the policy. We're ignoring that.")
 
     noise_inds, returns, sign_returns, lengths = [], [], [], []
-    # We set eps=0 because we're incrementing only.
     task_ob_stat = utils.RunningStat(self.env.observation_space.shape, eps=0)
 
     # Perform some rollouts with noise.
@@ -147,10 +170,6 @@ if __name__ == "__main__":
 
   ray.init(redirect_output=True)
 
-  # Tell Ray to serialize Config and Result objects.
-  ray.register_class(Config)
-  ray.register_class(Result)
-
   config = Config(l2coeff=0.005,
                   noise_stdev=0.02,
                   episodes_per_batch=10000,
@@ -180,12 +199,10 @@ if __name__ == "__main__":
              for _ in range(num_workers)]
 
   env = gym.make(env_name)
-  #with tf.Graph().as_default():
   sess = utils.make_session(single_threaded=False)
   policy = policies.MujocoPolicy(env.observation_space, env.action_space,
                                  **policy_params)
   tf_util.initialize()
-  #sess.run(tf.global_variables_initializer())
   optimizer = optimizers.Adam(policy, stepsize)
 
   ob_stat = utils.RunningStat(env.observation_space.shape, eps=1e-2)
@@ -199,6 +216,7 @@ if __name__ == "__main__":
     theta = policy.get_trainable_flat()
     assert theta.dtype == np.float32
 
+    # These rollouts could be done in parallel.
     results = [worker.do_rollouts(
                    theta,
                    ob_stat.mean if policy.needs_ob_stat else None,
@@ -252,12 +270,9 @@ if __name__ == "__main__":
             count == len(noise_inds_n))
     update_ratio = optimizer.update(-g + config.l2coeff * theta)
 
-    # Update ob stat (we're never running the policy in the master, but we
-    # might be snapshotting the policy).
-    if policy.needs_ob_stat:
-      policy.set_ob_stat(ob_stat.mean, ob_stat.std)
-
     step_tend = time.time()
+
+    # Log some statistics.
     tabular_logger.record_tabular("EpRewMean", returns_n2.mean())
     tabular_logger.record_tabular("EpRewStd", returns_n2.std())
     tabular_logger.record_tabular("EpLenMean", lengths_n2.mean())
