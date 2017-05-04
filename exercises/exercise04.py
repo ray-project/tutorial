@@ -36,6 +36,8 @@ if __name__ == "__main__":
       results.append(sum([helper() for _ in range(5)]))
     return results
 
+  # Sleep a little to improve the accuracy of the timing measurements below.
+  time.sleep(0.5)
   start_time = time.time()
 
   # Run two experiments. These could be done in parallel.

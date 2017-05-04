@@ -28,6 +28,8 @@ if __name__ == "__main__":
     time.sleep(np.random.uniform(0, 10))
     return time.time()
 
+  # Sleep a little to improve the accuracy of the timing measurements below.
+  time.sleep(0.5)
   start_time = time.time()
 
   result_ids = [f.remote() for _ in range(10)]

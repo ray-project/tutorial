@@ -29,6 +29,8 @@ if __name__ == "__main__":
     time.sleep(0.5)
     return x * y
 
+  # Sleep a little to improve the accuracy of the timing measurements below.
+  time.sleep(0.5)
   start_time = time.time()
 
   # Here we generate some data. This could be done in parallel.
