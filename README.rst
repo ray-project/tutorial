@@ -93,11 +93,11 @@ Longer Examples
 Now that you've completed the basic exercises, some more involved exercises are
 provided under ``examples/``.
 
+**Block Distributed Matrix Algorithms:** Implement a distributed matrix
+multiplication algorithm for block distributed matrices.
+
 **Hyperparameter Search:** Implement a basic hyperparameter search scheme in
 which a new experiment is started every time one finishes.
 
 **Evolutionary Algorithms:** Implement an evolutionary algorithm for solving
 reinforcement learning problems.
-
-**Block Distributed Matrix Algorithms:** Implement a distributed matrix
-multiplication algorithm for block distributed matrices.
