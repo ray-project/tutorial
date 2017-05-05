@@ -92,3 +92,5 @@ if __name__ == "__main__":
   expected_duration = np.ceil(20 / psutil.cpu_count()) * 0.5
   assert duration < expected_duration, ("Rollouts took {} seconds."
                                         .format(duration))
+
+  print("Success! The example took {} seconds.".format(duration))

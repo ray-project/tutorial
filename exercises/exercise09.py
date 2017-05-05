@@ -80,3 +80,5 @@ if __name__ == "__main__":
   assert results == list(range(20))
   assert duration < 1, ("The experiments ran in {} seconds. This is too "
                         "slow.".format(duration))
+
+  print("Success! The example took {} seconds.".format(duration))

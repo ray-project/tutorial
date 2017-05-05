@@ -115,3 +115,5 @@ if __name__ == "__main__":
   l.append(l)
   result = ray.get(f.remote(l))
   assert result == result[0]
+
+  print("Success! The example ran to completion.")

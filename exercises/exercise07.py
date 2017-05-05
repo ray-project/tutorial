@@ -64,3 +64,5 @@ if __name__ == "__main__":
 
   assert duration < 3, ("The experiments ran in {} seconds. This is too "
                         "slow.".format(duration))
+
+  print("Success! The example took {} seconds.".format(duration))

@@ -46,3 +46,5 @@ if __name__ == "__main__":
   assert results == [0, 1, 2, 3]
   assert duration < 1.1, ("The loop took {} seconds. This is too slow."
                           .format(duration))
+
+  print("Success! The example took {} seconds.".format(duration))

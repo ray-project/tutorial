@@ -57,3 +57,5 @@ if __name__ == "__main__":
 
   # Make sure the initial results actually completed first.
   assert max(initial_times) < min(remaining_times)
+
+  print("Success! The example took {} seconds.".format(duration))
