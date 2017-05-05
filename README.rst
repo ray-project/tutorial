@@ -22,7 +22,7 @@ Setup
 
   .. code-block:: bash
 
-    cd ray-tutorial
+    cd tutorial
     python setup.py install
 
 .. _`Ray installation instructions`: http://ray.readthedocs.io/en/latest/index.html
