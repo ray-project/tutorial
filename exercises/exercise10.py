@@ -104,16 +104,4 @@ if __name__ == "__main__":
   assert result.bar.b == 10000
   assert np.alltrue(result.bar.c, np.ones((1000, 10000)))
 
-  @ray.remote
-  def f(x):
-    return x
-
-  # Our approach to serialization currently does not work with recursive
-  # objects. Find a workaround for the following example, which is a list that
-  # recursively contains itself (you may modify f to make this work).
-  l = []
-  l.append(l)
-  result = ray.get(f.remote(l))
-  assert result == result[0]
-
   print("Success! The example ran to completion.")
