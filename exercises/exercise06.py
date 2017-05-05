@@ -32,7 +32,7 @@ if __name__ == "__main__":
     return time.time()
 
   # Sleep a little to improve the accuracy of the timing measurements below.
-  time.sleep(0.5)
+  time.sleep(2.0)
   start_time = time.time()
 
   result_ids = [f.remote() for _ in range(10)]

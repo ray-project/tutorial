@@ -45,7 +45,7 @@ if __name__ == "__main__":
   f2 = Foo()
 
   # Sleep a little to improve the accuracy of the timing measurements below.
-  time.sleep(0.5)
+  time.sleep(2.0)
   start_time = time.time()
 
   # We want to parallelize this code. However, it is not straightforward to

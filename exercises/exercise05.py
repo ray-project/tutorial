@@ -29,7 +29,7 @@ if __name__ == "__main__":
     return i, x
 
   # Sleep a little to improve the accuracy of the timing measurements below.
-  time.sleep(0.5)
+  time.sleep(2.0)
   start_time = time.time()
 
   # This launches 20 tasks, each of which takes a random amount of time to

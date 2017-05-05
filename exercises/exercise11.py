@@ -81,6 +81,8 @@ if __name__ == "__main__":
     add_advantage_values(trajectory, gamma, lam, reward_filter)
     return trajectory
 
+  # Sleep a little to improve the accuracy of the timing measurements below.
+  time.sleep(2.0)
   start_time = time.time()
 
   # Do some rollouts serially. These should be done in parallel.

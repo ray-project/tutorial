@@ -31,7 +31,7 @@ if __name__ == "__main__":
     return i
 
   # Sleep a little to improve the accuracy of the timing measurements below.
-  time.sleep(0.5)
+  time.sleep(2.0)
   start_time = time.time()
 
   # This loop is too slow. The calls to slow_function should happen in
