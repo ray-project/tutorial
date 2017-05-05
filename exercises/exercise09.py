@@ -102,6 +102,6 @@ if __name__ == "__main__":
   result = ray.get(ray.put(Qux(1000, 10000)))
   assert result.bar.a == 1000
   assert result.bar.b == 10000
-  assert np.alltrue(result.bar.c, np.ones((1000, 10000)))
+  assert np.allclose(result.bar.c, np.ones((1000, 10000)))
 
   print("Success! The example ran to completion.")
