@@ -38,16 +38,19 @@ if __name__ == "__main__":
   result_ids = [f.remote(i) for i in range(20)]
   # Get one batch of tasks. Instead of waiting for a fixed subset of tasks, we
   # should instead use the first 10 tasks that finish.
-  initial_results = ray.get(result_ids[:10])
+  initial_results, result_ids = ray.wait(result_ids, num_returns=10)
 
   end_time = time.time()
   duration = end_time - start_time
 
   # Wait for the remaining tasks to complete.
-  remaining_results = ray.get(result_ids[10:])
+  remaining_results, _ = ray.wait(result_ids, num_returns=10)
 
   assert len(initial_results) == 10
   assert len(remaining_results) == 10
+
+  initial_results = ray.get(initial_results)
+  remaining_results = ray.get(remaining_results)
 
   initial_indices = [result[0] for result in initial_results]
   initial_times = [result[1] for result in initial_results]

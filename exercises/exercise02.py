@@ -21,6 +21,7 @@ if __name__ == "__main__":
 
   # This function is a proxy for a more interesting and computationally
   # intensive function.
+  @ray.remote
   def slow_function(i):
     time.sleep(np.random.uniform(0, 0.1))
     return i + 1
@@ -37,8 +38,10 @@ if __name__ == "__main__":
   for i in range(4):
     x = 100 * i
     for j in range(20):
-      x = slow_function(x)
+      x = slow_function.remote(x)
     results.append(x)
+
+  results = ray.get(results)
 
   end_time = time.time()
   duration = end_time - start_time

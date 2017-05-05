@@ -26,6 +26,7 @@ if __name__ == "__main__":
 
   # This function is a proxy for a more interesting and computationally
   # intensive function.
+  @ray.remote
   def slow_function(i):
     time.sleep(1)
     return i
@@ -38,7 +39,9 @@ if __name__ == "__main__":
   # parallel.
   results = []
   for i in range(4):
-    results.append(slow_function(i))
+    results.append(slow_function.remote(i))
+
+  results = ray.get(results)
 
   end_time = time.time()
   duration = end_time - start_time

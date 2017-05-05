@@ -19,12 +19,14 @@ if __name__ == "__main__":
   ray.init(num_cpus=8, redirect_output=True)
 
   # This is a proxy for a function which generates some data.
+  @ray.remote
   def create_data(i):
     time.sleep(0.1)
     return i * np.ones(10000)
 
   # This is a proxy for an expensive aggregation step (which is also
   # commutative and associative so it can be used in a tree-reduce).
+  @ray.remote
   def aggregate_data(x, y):
     time.sleep(0.5)
     return x * y
@@ -34,7 +36,7 @@ if __name__ == "__main__":
   start_time = time.time()
 
   # Here we generate some data. This could be done in parallel.
-  vectors = [create_data(i + 1) for i in range(8)]
+  vectors = [create_data.remote(i + 1) for i in range(8)]
 
   # Here we aggregate all of the data by getting it on the driver and then
   # repeatedly calling aggregate_data. However, this could be done faster by
@@ -45,9 +47,10 @@ if __name__ == "__main__":
   # a speedup because the underlying graph of dependencies between the tasks is
   # essentially linear. There are a handful of ways to do this, and the
   # aggregation can actually be done cleverly in two lines.
-  result = vectors[0]
-  for vector in vectors[1:]:
-    result = aggregate_data(result, vector)
+  while len(vectors) > 1:
+    vectors.append(aggregate_data.remote(vectors.pop(0), vectors.pop(0)))
+
+  result = ray.get(vectors)
 
   end_time = time.time()
   duration = end_time - start_time
