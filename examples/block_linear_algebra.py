@@ -1,3 +1,6 @@
+# EXERCISE: Implement all of the missing functions below. This script should
+# run without raising any exceptions.
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
