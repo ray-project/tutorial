@@ -82,35 +82,41 @@ if __name__ == "__main__":
       b = tf.Variable(tf.zeros([1]))
       y = w * x_data + b
 
-      self.loss = tf.reduce_mean(tf.square(y - y_data))
+      loss = tf.reduce_mean(tf.square(y - y_data))
       optimizer = tf.train.GradientDescentOptimizer(0.5)
       grads = optimizer.compute_gradients(loss)
       self.train = optimizer.apply_gradients(grads)
 
       init = tf.global_variables_initializer()
-      self.sess = tf.Session()
+      sess = tf.Session()
 
-      self.sess.run(init)
+      sess.run(init)
+      self.variables = ray.experimental.TensorFlowVariables(loss, sess)
 
     def set_weights(self, weights):
-      raise NotImplementedError
+     self.variables.set_weights(weights)
 
     def get_weights(self):
-      raise NotImplementedError
+     return self.variables.get_weights()
 
   # Create a few actors with the model.
   actors = [SimpleModel() for _ in range(4)]
 
   # Get the weights from the actors.
   # EXERCISE: FILL THIS IN.
-  raise Exception("Implement this.")
+  weights = [actor.get_weights() for actor in actors]
 
   # Average the weights.
   # EXERCISE: FILL THIS IN.
-  raise Exception("Implement this.")
+  weights = ray.get(weights)
+  mean_weights = {}
+  for variable in weights[0]:
+    values = [weight[variable] for weight in weights]
+    mean_weights[variable] = np.mean(values, axis=0)
 
   # Set the average weights on the actors.
   # EXERCISE: FILL THIS IN.
-  raise Exception("Implement this.")
+  for actor in actors:
+      actor.set_weights(mean_weights)
 
   print("Success! The example ran to completion.")

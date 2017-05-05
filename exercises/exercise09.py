@@ -64,6 +64,7 @@ if __name__ == "__main__":
       self.x = x
 
   # By default, Ray doesn't know how to serialize Foo objects. Make this work.
+  ray.register_class(Foo)
   result = ray.get(ray.put(Foo(1)))
   assert result.x == 1
 
@@ -81,6 +82,8 @@ if __name__ == "__main__":
   # below work. NOTE: if Ray falls back to pickling the Qux object, then Ray
   # will not be able to efficiently handle the large numpy array inside.
   # Compare the performance difference with and without pickling.
+  ray.register_class(Bar)
+  ray.register_class(Qux)
   result = ray.get(ray.put(Qux(1000, 10000)))
   assert result.bar.a == 1000
   assert result.bar.b == 10000

@@ -31,6 +31,7 @@ import time
 if __name__ == "__main__":
   ray.init(num_cpus=4, redirect_output=True)
 
+  @ray.actor
   class Foo(object):
     def __init__(self):
       self.counter = 0
@@ -56,6 +57,8 @@ if __name__ == "__main__":
   for _ in range(5):
     results.append(f1.increment())
     results.append(f2.increment())
+
+  results = ray.get(results)
 
   end_time = time.time()
   duration = end_time - start_time

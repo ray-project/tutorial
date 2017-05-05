@@ -71,6 +71,7 @@ if __name__ == "__main__":
   time.sleep(2.0)
   start_time = time.time()
 
+  neural_net_weights = ray.put(neural_net_weights)
   results = ray.get([use_weights.remote(neural_net_weights, i)
                      for i in range(20)])
 

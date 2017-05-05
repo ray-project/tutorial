@@ -54,39 +54,50 @@ if __name__ == "__main__":
   lam = 1.0
   horizon = 2000
 
-  # Create a simulator environment. This is a wrapper containing a batch of gym
-  # environments. The simulator can be simulated with "env.step(action)", which
-  # is called within the "rollouts" function below.
-  env = BatchedEnv(name, batchsize, preprocessor=preprocessor)
+  class Environment(object):
+    def __init__(self):
+      # Create a simulator environment. This is a wrapper containing a batch of gym
+      # environments. The simulator can be simulated with "env.step(action)", which
+      # is called within the "rollouts" function below.
+      self.env = BatchedEnv(name, batchsize, preprocessor=preprocessor)
 
-  # Create a neural net policy. Note that we create the neural net inside its
-  # own graph. This can help avoid variable name collisions. It shouldn't
-  # matter in this example, but if you create a neural net inside of a remote
-  # function, and multiple tasks execute that remote function on the same
-  # worker, then this can lead to variable name collisions.
-  with tf.Graph().as_default():
-    sess = tf.Session()
-    if preprocessor.shape is None:
-      preprocessor.shape = env.observation_space.shape
-    policy = ProximalPolicyLoss(env.observation_space, env.action_space,
-                                preprocessor, config, sess)
-    observation_filter = MeanStdFilter(preprocessor.shape, clip=None)
-    reward_filter = MeanStdFilter((), clip=None)
-    sess.run(tf.global_variables_initializer())
+      # Create a neural net policy. Note that we create the neural net inside its
+      # own graph. This can help avoid variable name collisions. It shouldn't
+      # matter in this example, but if you create a neural net inside of a remote
+      # function, and multiple tasks execute that remote function on the same
+      # worker, then this can lead to variable name collisions.
+      with tf.Graph().as_default():
+        sess = tf.Session()
+        if preprocessor.shape is None:
+          preprocessor.shape = self.env.observation_space.shape
+        self.policy = ProximalPolicyLoss(self.env.observation_space,
+            self.env.action_space, preprocessor, config, sess)
+        self.observation_filter = MeanStdFilter(preprocessor.shape, clip=None)
+        self.reward_filter = MeanStdFilter((), clip=None)
+        sess.run(tf.global_variables_initializer())
 
+  @ray.remote
   def rollout():
+    environment = Environment()
+
     # Collect some rollouts.
-    trajectory = rollouts(policy, env, horizon, observation_filter,
-                          reward_filter)
-    add_advantage_values(trajectory, gamma, lam, reward_filter)
-    return trajectory
+    trajectories = []
+    for _ in range(5):
+      trajectory = rollouts(environment.policy, environment.env, horizon,
+                            environment.observation_filter,
+                            environment.reward_filter)
+      add_advantage_values(trajectory, gamma, lam, environment.reward_filter)
+      trajectories.append(trajectory)
+    return trajectories
 
   # Sleep a little to improve the accuracy of the timing measurements below.
   time.sleep(2.0)
   start_time = time.time()
 
   # Do some rollouts serially. These should be done in parallel.
-  rollouts = [rollout() for _ in range(20)]
+  rollouts = [rollout.remote() for _ in range(4)]
+  rollouts = ray.get(rollouts)
+  rollouts = [trajectory for rollout in rollouts for trajectory in rollout]
 
   end_time = time.time()
   duration = end_time - start_time
