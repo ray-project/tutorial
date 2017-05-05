@@ -55,9 +55,11 @@ tasks.
 
 **Exercise 4:** Call remote functions from within remote functions.
 
-**Exercise 5:** Use ``ray.wait`` to ignore stragglers.
+**Exercise 5:** Use ``ray.wait`` to ignore stragglers. See the
+`documentation for wait`_.
 
 **Exercise 6:** Use ``ray.wait`` to process tasks in the order that they finish.
+See the `documentation for wait`_.
 
 **Exercise 7:** Use actors to share state between tasks. See the documentation
 on `using actors`_.
@@ -82,6 +84,7 @@ and set them in another actor. You may want to read the documentation on
 example that does something similar, you may want to see the `ResNet example`_.
 
 .. _`Ray documentation`: http://ray.readthedocs.io/en/latest/?badge=latest
+.. _`documentation for wait`: http://ray.readthedocs.io/en/latest/api.html#waiting-for-a-subset-of-tasks-to-finish.
 .. _`using actors`: http://ray.readthedocs.io/en/latest/actors.html
 .. _`using Ray with TensorFlow`: http://ray.readthedocs.io/en/latest/using-ray-with-tensorflow.html
 .. _`ResNet example`: http://ray.readthedocs.io/en/latest/example-resnet.html
