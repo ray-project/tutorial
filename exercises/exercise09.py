@@ -59,24 +59,6 @@ import time
 if __name__ == "__main__":
   ray.init(num_cpus=4, redirect_output=True)
 
-  neural_net_weights = {"variable{}".format(i): np.random.normal(size=1000000)
-                        for i in range(50)}
-
-  # For fun, you may be interested in comparing the following times for
-  # different values of "neural_net_weights". This is best done in an ipython
-  # interpreter.
-  #
-  #     %time x_id = ray.put(neural_net_weights)
-  #     %time x_val = ray.get(x_id)
-  #
-  #     import pickle
-  #     %time serialized = pickle.dumps(neural_net_weights)
-  #     %time deserialized = pickle.loads(serialized)
-  #
-  # Note that when you call ray.put, in addition to serializing the object, we
-  # are copying it into shared memory where it can be efficiently accessed by
-  # other workers on the same machine.
-
   class Foo(object):
     def __init__(self, x):
       self.x = x
