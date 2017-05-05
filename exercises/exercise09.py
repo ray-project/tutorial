@@ -80,7 +80,25 @@ if __name__ == "__main__":
   # By default, Ray doesn't know how to serialize Qux objects. Make the line
   # below work. NOTE: if Ray falls back to pickling the Qux object, then Ray
   # will not be able to efficiently handle the large numpy array inside.
-  # Compare the performance difference with and without pickling.
+  # You can compare the performance difference with and without pickling as
+  # follows (in ipython).
+  #
+  #     # Time it without pickle.
+  #     ray.register_class(Qux)
+  #     ray.register_class(Bar)
+  #     q = Qux(1000, 1000)
+  #     %time q_id = ray.put(q)
+  #     %time q_val = ray.get(q_id)
+  #
+  #     # Time it with pickle.
+  #     ray.register_class(Qux, pickle=True)
+  #     q = Qux(1000, 1000)
+  #     %time q_id = ray.put(q)
+  #     %time q_vl = ray.get(q_id)
+  #
+  # Note that the above timing code will only work in the order listed above.
+  # Once you tell Ray to serialize the class using pickle, it will always use
+  # pickle.
   result = ray.get(ray.put(Qux(1000, 10000)))
   assert result.bar.a == 1000
   assert result.bar.b == 10000
