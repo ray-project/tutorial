@@ -47,5 +47,6 @@ if __name__ == "__main__":
 
   assert results == sorted(results), ("The results were not processed in the "
                                       "order that they finished.")
-
+  end_time = time.time()
+  duration = end_time - start_time
   print("Success! The example took {} seconds.".format(duration))
