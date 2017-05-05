@@ -4,8 +4,9 @@
 # some rollouts (that is, we use the neural net to choose actions to take in
 # the environment). However, all of the rollouts are done serially.
 #
-# EXERCISE: Change this code to do rollouts in parallel. To avoid recreating
-# the neural net over and over, you may want to use actors.
+# EXERCISE: Change this code to do rollouts in parallel by making an actor that
+# creates both the "env" object and the "policy" object in its constructor. The
+# "rollout" function should then be a method of the actor class.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -74,6 +75,14 @@ if __name__ == "__main__":
     reward_filter = MeanStdFilter((), clip=None)
     sess.run(tf.global_variables_initializer())
 
+  # Note that directly making this function a remote function will give a
+  # pickling error. That happens because when we define a remote function, we
+  # pickle the function definition and ship the definition to the workers.
+  # However, this function uses "policy", which is a TensorFlow neural net, and
+  # TensorFlow often cannot be pickled. This could be addressed by constructing
+  # "policy" within the rollout function, but in this case it's better to
+  # create an actor that creates the policy in its constructor (so that we can
+  # reuse the policy between multiple calls to "rollout").
   def rollout():
     # Collect some rollouts.
     trajectory = rollouts(policy, env, horizon, observation_filter,
@@ -81,18 +90,23 @@ if __name__ == "__main__":
     add_advantage_values(trajectory, gamma, lam, reward_filter)
     return trajectory
 
-  # Sleep a little to improve the accuracy of the timing measurements below.
-  time.sleep(2.0)
+  # Do some rollouts to make sure that all of the neural nets have been
+  # constructed. This isn't relevant for the serial code, but when we create
+  # the neural nets in the background using actors, we don't want the time to
+  # create the actors to interfere with the timing measurement below. Make sure
+  # that this code uses all of the actors.
+  collected_rollouts = [rollout() for _ in range(20)]
+
   start_time = time.time()
 
   # Do some rollouts serially. These should be done in parallel.
-  rollouts = [rollout() for _ in range(20)]
+  collected_rollouts = [rollout() for _ in range(20)]
 
   end_time = time.time()
   duration = end_time - start_time
 
   expected_duration = np.ceil(20 / psutil.cpu_count()) * 0.5
-  assert duration < expected_duration, ("Rollouts took {} seconds."
-                                        .format(duration))
+  assert duration < expected_duration, ("Rollouts took {} seconds. This is "
+                                        "too slow.".format(duration))
 
   print("Success! The example took {} seconds.".format(duration))
