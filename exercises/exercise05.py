@@ -8,7 +8,8 @@
 # time to complete. We'd like to process the results in two batches (each of
 # size 10). Change the code so that instead of waiting for a fixed set of 10
 # tasks to finish, we make the first batch consist of the first 10 tasks that
-# complete. The second batch should consist of the remaining tasks.
+# complete. The second batch should consist of the remaining tasks. Do this
+# exercise by using ray.wait.
 
 from __future__ import absolute_import
 from __future__ import division

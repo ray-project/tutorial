@@ -30,10 +30,9 @@ if __name__ == "__main__":
   start_time = time.time()
 
   # This loop is too slow. Some of the calls to slow_function should happen in
-  # parallel. However, they cannot all happen in parallel, because some of them
-  # calls use the outputs of other calls. The underlying computation graph
-  # encoding the dependencies between these tasks consists of four chains of
-  # length twenty.
+  # parallel. Note that some of the calls may use the outputs of other calls.
+  # The underlying computation graph encoding the dependencies between these
+  # tasks consists of four chains of length twenty.
   results = []
   for i in range(4):
     x = 100 * i

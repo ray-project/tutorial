@@ -22,7 +22,7 @@ Setup
 
   .. code-block:: bash
 
-    cd ray-tutorial
+    cd tutorial
     python setup.py install
 
 .. _`Ray installation instructions`: http://ray.readthedocs.io/en/latest/index.html
@@ -64,23 +64,20 @@ See the `documentation for wait`_.
 **Exercise 7:** Use actors to share state between tasks. See the documentation
 on `using actors`_.
 
-**Exercise 8:** Use actors to avoid multiple expensive initializations. See the
-documentation on `using actors`_.
-
-**Exercise 9:** Use ``ray.put`` to avoid serializing and copying the same
+**Exercise 8:** Use ``ray.put`` to avoid serializing and copying the same
 object into shared memory multiple times.
 
-**Exercise 10:** Use ``ray.register_class`` to enable Ray to serialize custom
+**Exercise 9:** Use ``ray.register_class`` to enable Ray to serialize custom
 classes.
 
-**Exercise 11:** Parallelize a serial example that uses a neural net to perform
+**Exercise 10:** Parallelize a serial example that uses a neural net to perform
 rollouts in a gym environment.
 
-**Exercise 12:** Extract neural network weights from an actor on one process,
+**Exercise 11:** Extract neural network weights from an actor on one process,
 and set them in another actor. You may want to read the documentation on
 `using Ray with TensorFlow`_.
 
-**Exercise 13:** Specify that an actor requires some GPUs. For a complete
+**Exercise 12:** Specify that an actor requires some GPUs. For a complete
 example that does something similar, you may want to see the `ResNet example`_.
 
 .. _`Ray documentation`: http://ray.readthedocs.io/en/latest/?badge=latest

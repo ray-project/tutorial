@@ -1,8 +1,37 @@
-# The goal of this exercise is to illustrate how to use actors to avoid
-# expensive initializations.
+# The goal of this exercise is to illustrate how to speed up serialization by
+# using ray.put.
 #
-# EXERCISE: Avoid the overhead of constantly recreating the "Foo" object inside
-# of the remote function by using actors.
+# When objects are passed into a remote function, we put them in the object
+# store under the hood. That is, if "f" is a remote function, the code
+#
+#    x = np.zeros(1000)
+#    f.remote(x)
+#
+# is essentially transformed under the hood to
+#
+#    x = np.zeros(1000)
+#    x_id = ray.put(x)
+#    f.remote(x_id)
+#
+# The call to ray.put copies the numpy array into the shared-memory object
+# store, from where it can be read by all of the worker processes (without
+# additional copying). However, if you do something like
+#
+#     for i in range(10):
+#       f.remote(x)
+#
+# then 10 copies of the array will be placed into the object store. This takes
+# up more memory in the object store than is necessary, and it also takes time
+# to copy the array into the object store over and over. This can be made more
+# efficient by placing the array in the object store only once as follows.
+#
+#     x_id = ray.put(x)
+#     for i in range(10):
+#       f.remote(x_id)
+#
+# EXERCISE: Speed up the code below and reduce the memory footprint by calling
+# ray.put on the neural net weights before passing them into the remote
+# functions.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -14,38 +43,42 @@ import time
 
 
 if __name__ == "__main__":
-  ray.init(num_cpus=4, redirect_output=True)
+  ray.init(num_cpus=20, redirect_output=True)
 
-  class Foo(object):
-    def __init__(self):
-      # This class takes a long time to initialize. For example, maybe it
-      # constructs a neural net and places the neural net on a GPU.
-      time.sleep(1)
+  neural_net_weights = {"variable{}".format(i): np.random.normal(size=1000000)
+                        for i in range(50)}
 
-    def do_something(self):
-      # However, the class can be used very quickly.
-      time.sleep(0.1)
-      return 1
+  # For fun, you may be interested in comparing the following times, for
+  # different values of "neural_net_weights". This is best done in an ipython
+  # interpreter.
+  #
+  #     %time x_id = ray.put(neural_net_weights)
+  #     %time x_val = ray.get(x_id)
+  #
+  #     import pickle
+  #     %time serialized = pickle.dumps(neural_net_weights)
+  #     %time deserialized = pickle.loads(serialized)
+  #
+  # Note that when you call ray.put, in addition to serializing the object, we
+  # are copying it into shared memory where it can be efficiently accessed by
+  # other workers on the same machine.
 
-  # Here, we define a remote function that creates a Foo object and uses it to
-  # do something simple. There's no good reason to repeatedly recreate the Foo
-  # object.
   @ray.remote
-  def do_something():
-    f = Foo()
-    return f.do_something()
+  def use_weights(weights, i):
+    return i
 
   # Sleep a little to improve the accuracy of the timing measurements below.
   time.sleep(2.0)
   start_time = time.time()
 
-  results = ray.get([do_something.remote() for _ in range(16)])
+  results = ray.get([use_weights.remote(neural_net_weights, i)
+                     for i in range(20)])
 
   end_time = time.time()
   duration = end_time - start_time
 
-  assert results == 16 * [1]
-  assert duration < 2, ("The experiments ran in {} seconds. This is too "
+  assert results == list(range(20))
+  assert duration < 1, ("The experiments ran in {} seconds. This is too "
                         "slow.".format(duration))
 
   print("Success! The example took {} seconds.".format(duration))
