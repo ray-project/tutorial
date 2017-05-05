@@ -5,8 +5,8 @@ from __future__ import print_function
 import numpy as np
 import ray
 
-from reinforce.filter import NoFilter
-from reinforce.utils import flatten, concatenate
+from ray_tutorial.reinforce.filter import NoFilter
+from ray_tutorial.reinforce.utils import flatten, concatenate
 
 def rollouts(policy, env, horizon, observation_filter=NoFilter(), reward_filter=NoFilter()):
   """Perform a batch of rollouts of a policy in an environment.
