@@ -5,9 +5,9 @@ from __future__ import print_function
 import gym.spaces
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
-from reinforce.models.visionnet import vision_net
-from reinforce.models.fcnet import fc_net
-from reinforce.distributions import Categorical, DiagGaussian
+from ray_tutorial.reinforce.models.vision_net import vision_net
+from ray_tutorial.reinforce.models.fc_net import fc_net
+from ray_tutorial.reinforce.distributions import Categorical, DiagGaussian
 
 class ProximalPolicyLoss(object):
 

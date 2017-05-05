@@ -37,7 +37,7 @@ if __name__ == "__main__":
     return results
 
   # Sleep a little to improve the accuracy of the timing measurements below.
-  time.sleep(0.5)
+  time.sleep(2.0)
   start_time = time.time()
 
   # Run two experiments. These could be done in parallel.
@@ -51,3 +51,5 @@ if __name__ == "__main__":
   assert sum(experiment2) == 50
   assert duration < 0.35, ("The experiments ran in {} seconds. This is too "
                           "slow.".format(duration))
+
+  print("Success! The example took {} seconds.".format(duration))

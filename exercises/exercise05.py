@@ -1,6 +1,9 @@
 # The goal of this exercise is to show how to use ray.wait to avoid waiting for
 # slow tasks.
 #
+# See the documentation for ray.wait at
+# http://ray.readthedocs.io/en/latest/api.html#waiting-for-a-subset-of-tasks-to-finish.
+#
 # EXERCISE: This script starts 20 tasks, each of which takes a random amount of
 # time to complete. We'd like to process the results in two batches (each of
 # size 10). Change the code so that instead of waiting for a fixed set of 10
@@ -26,7 +29,7 @@ if __name__ == "__main__":
     return i, x
 
   # Sleep a little to improve the accuracy of the timing measurements below.
-  time.sleep(0.5)
+  time.sleep(2.0)
   start_time = time.time()
 
   # This launches 20 tasks, each of which takes a random amount of time to
@@ -57,3 +60,5 @@ if __name__ == "__main__":
 
   # Make sure the initial results actually completed first.
   assert max(initial_times) < min(remaining_times)
+
+  print("Success! The example took {} seconds.".format(duration))

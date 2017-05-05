@@ -36,7 +36,7 @@ if __name__ == "__main__":
     return f.do_something()
 
   # Sleep a little to improve the accuracy of the timing measurements below.
-  time.sleep(0.5)
+  time.sleep(2.0)
   start_time = time.time()
 
   results = ray.get([do_something.remote() for _ in range(16)])
@@ -47,3 +47,5 @@ if __name__ == "__main__":
   assert results == 16 * [1]
   assert duration < 2, ("The experiments ran in {} seconds. This is too "
                         "slow.".format(duration))
+
+  print("Success! The example took {} seconds.".format(duration))

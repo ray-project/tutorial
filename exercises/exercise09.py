@@ -68,7 +68,7 @@ if __name__ == "__main__":
     return i
 
   # Sleep a little to improve the accuracy of the timing measurements below.
-  time.sleep(0.5)
+  time.sleep(2.0)
   start_time = time.time()
 
   results = ray.get([use_weights.remote(neural_net_weights, i)
@@ -80,3 +80,5 @@ if __name__ == "__main__":
   assert results == list(range(20))
   assert duration < 1, ("The experiments ran in {} seconds. This is too "
                         "slow.".format(duration))
+
+  print("Success! The example took {} seconds.".format(duration))

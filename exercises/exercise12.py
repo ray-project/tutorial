@@ -112,3 +112,5 @@ if __name__ == "__main__":
   # Set the average weights on the actors.
   # EXERCISE: FILL THIS IN.
   raise Exception("Implement this.")
+
+  print("Success! The example ran to completion.")

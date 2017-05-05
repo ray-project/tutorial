@@ -116,3 +116,5 @@ if __name__ == "__main__":
   for actor in actors:
     gpu_ids += actor.get_gpu_ids()
   assert set(gpu_ids) == set(range(4))
+
+  print("Success! The example ran to completion.")

@@ -1,6 +1,9 @@
 # The goal of this exercise is to show how to use ray.wait to process tasks in
 # the order that they finish.
 #
+# See the documentation for ray.wait at
+# http://ray.readthedocs.io/en/latest/api.html#waiting-for-a-subset-of-tasks-to-finish.
+#
 # The code below runs 10 tasks and retrieves the results in the order that the
 # tasks were launched. However, since each task takes a random amount of time
 # to finish, we could instead process the tasks in the order that they finish.
@@ -29,7 +32,7 @@ if __name__ == "__main__":
     return time.time()
 
   # Sleep a little to improve the accuracy of the timing measurements below.
-  time.sleep(0.5)
+  time.sleep(2.0)
   start_time = time.time()
 
   result_ids = [f.remote() for _ in range(10)]
@@ -44,3 +47,5 @@ if __name__ == "__main__":
 
   assert results == sorted(results), ("The results were not processed in the "
                                       "order that they finished.")
+
+  print("Success! The example took {} seconds.".format(duration))

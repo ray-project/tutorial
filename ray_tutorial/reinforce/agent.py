@@ -7,10 +7,10 @@ import os
 
 import ray
 
-from reinforce.env import BatchedEnv
-from reinforce.policy import ProximalPolicyLoss
-from reinforce.filter import MeanStdFilter
-from reinforce.rollout import rollouts, add_advantage_values
+from ray_tutorial.reinforce.env import BatchedEnv
+from ray_tutorial.reinforce.policy import ProximalPolicyLoss
+from ray_tutorial.reinforce.filter import MeanStdFilter
+from ray_tutorial.reinforce.rollout import rollouts, add_advantage_values
 
 class Agent(object):
 

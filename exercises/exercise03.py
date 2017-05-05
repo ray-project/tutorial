@@ -30,7 +30,7 @@ if __name__ == "__main__":
     return x * y
 
   # Sleep a little to improve the accuracy of the timing measurements below.
-  time.sleep(0.5)
+  time.sleep(2.0)
   start_time = time.time()
 
   # Here we generate some data. This could be done in parallel.
@@ -56,3 +56,5 @@ if __name__ == "__main__":
   assert duration < 0.1 + 1.5 + 0.3, ("FAILURE: The data generation and "
                                       "aggregation took {} seconds. This is "
                                       "too slow".format(duration))
+
+  print("Success! The example took {} seconds.".format(duration))
