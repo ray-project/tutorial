@@ -43,6 +43,7 @@ if __name__ == "__main__":
 
   # This is a class with a simple neural net. Make this an actor and make it
   # require a single GPU.
+  @ray.actor(num_gpus=1)
   class Network(object):
     def __init__(self, x, y):
       # You should be able to access the GPU IDs in here, and set
@@ -103,6 +104,8 @@ if __name__ == "__main__":
   # and put in the object store. In order to place them in the object store
   # only once, you can use call ray.put on the objects and pass the resulting
   # object IDs into the Network constructor.
+  x_data = ray.put(x_data)
+  y_data = ray.put(y_data)
   actors = [Network(x_data, y_data) for _ in range(4)]
 
   # Get the weights of the first actor.
@@ -113,8 +116,9 @@ if __name__ == "__main__":
 
   # Check that the GPU IDs are different.
   gpu_ids = []
+  gpu_oids = []
   for actor in actors:
-    gpu_ids += actor.get_gpu_ids()
+    gpu_ids += ray.get(actor.get_gpu_ids())
   assert set(gpu_ids) == set(range(4))
 
   print("Success! The example ran to completion.")
