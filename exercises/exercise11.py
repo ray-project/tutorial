@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
       self.loss = tf.reduce_mean(tf.square(y - y_data))
       optimizer = tf.train.GradientDescentOptimizer(0.5)
-      grads = optimizer.compute_gradients(loss)
+      grads = optimizer.compute_gradients(self.loss)
       self.train = optimizer.apply_gradients(grads)
 
       init = tf.global_variables_initializer()
