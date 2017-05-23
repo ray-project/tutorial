@@ -22,9 +22,6 @@
 # we are currently only starting two workers, so the opportunity for
 # parallelism will depend on the number of workers.
 #
-# EXERCISE: You will probably need to tell Ray how to serialize Config and
-# Result objects using "ray.register_class".
-#
 # EXERCISE: This code uses a large numpy array of noise that is shared between
 # the workers. This array is created by the function "create_shared_noise".
 # Make "create_shared_noise" a remote function so that the noise object is put

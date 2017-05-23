@@ -1,19 +1,58 @@
-# The goal of this exercise is to combine a handful of lessons in a single
-# example and to get some practice parallelizing serial code. In this exercise,
-# we create a neural network and a gym environment and use the network to do
-# some rollouts (that is, we use the neural net to choose actions to take in
-# the environment). However, all of the rollouts are done serially.
+# The goal of this exercise is to show how to send neural network weights
+# between workers and the driver.
 #
-# EXERCISE: Change this code to do rollouts in parallel by making an actor that
-# creates both the "env" object and the "policy" object in its constructor. The
-# "rollout" function should then be a method of the actor class.
+# Since pickling and unpickling a TensorFlow graph can be inefficient or may
+# not work at all, it is most efficient to ship the weights between processes
+# as a dictionary of numpy arrays.
+#
+# We provide the helper class ray.experimental.TensorFlowVariables to help with
+# get and set weights. Similar techniques should work other neural net
+# libraries.
+#
+# Consider the following neural net definition.
+#
+#     import tensorflow as tf
+#
+#     x_data = tf.placeholder(tf.float32, shape=[100])
+#     y_data = tf.placeholder(tf.float32, shape=[100])
+#
+#     w = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
+#     b = tf.Variable(tf.zeros([1]))
+#     y = w * x_data + b
+#
+#     loss = tf.reduce_mean(tf.square(y - y_data))
+#     optimizer = tf.train.GradientDescentOptimizer(0.5)
+#     grads = optimizer.compute_gradients(loss)
+#     train = optimizer.apply_gradients(grads)
+#
+#     init = tf.global_variables_initializer()
+#     sess = tf.Session()
+#     sess.run(init)
+#
+# Then we can use the helper class as follows.
+#
+#     variables = ray.experimental.TensorFlowVariables(loss, sess)
+#     weights = variables.get_weights()
+#     variables.set_weights(weights)
+#
+# Note that there are analogous methods "variables.get_flat" and
+# "variables.set_flat", which concatenate the weights as a single array insead
+# of a dictionary.
+#
+# EXERCISE: Use the ray.experimental.TensorFlowVariables helper class to
+# implement the set_weights and get_weights methods for the actor so that the
+# driver can retrieve the weights from the actor and set new weights on the
+# actor.
+#
+# EXERCISE: Additionally, use the actor methods to retrieve the neural net
+# weights from all the actors, then average the weights, and then set the
+# average on all of the actors.
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-import psutil
 import ray
 import tensorflow as tf
 import time
@@ -28,85 +67,50 @@ from ray_tutorial.reinforce.env import (NoPreprocessor, AtariRamPreprocessor,
 from ray_tutorial.reinforce.models.fc_net import fc_net
 from ray_tutorial.reinforce.models.vision_net import vision_net
 
-config = {"kl_coeff": 0.2,
-          "num_sgd_iter": 30,
-          "sgd_stepsize": 5e-5,
-          "sgd_batchsize": 128,
-          "entropy_coeff": 0.0,
-          "clip_param": 0.3,
-          "kl_target": 0.01,
-          "timesteps_per_batch": 40000}
-
 
 if __name__ == "__main__":
   ray.init(num_cpus=4, redirect_output=True)
 
-  # For a more interesting example, try this with the following values. Note
-  # that this will require installing gym with the atari environments. You'll
-  # probably want to use a smaller batchsize for this.
-  #
-  #     name = "Pong-v0"
-  #     preprocessor = AtariPixelPreprocessor()
+  # This actor contains a simple neural network.
+  @ray.remote
+  class SimpleModel(object):
+    def __init__(self):
+      x_data = tf.placeholder(tf.float32, shape=[100])
+      y_data = tf.placeholder(tf.float32, shape=[100])
 
-  name = "CartPole-v0"
-  batchsize = 100
-  preprocessor = NoPreprocessor()
-  gamma = 0.995
-  lam = 1.0
-  horizon = 2000
+      w = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
+      b = tf.Variable(tf.zeros([1]))
+      y = w * x_data + b
 
-  # Create a simulator environment. This is a wrapper containing a batch of gym
-  # environments. The simulator can be simulated with "env.step(action)", which
-  # is called within the "rollouts" function below.
-  env = BatchedEnv(name, batchsize, preprocessor=preprocessor)
+      self.loss = tf.reduce_mean(tf.square(y - y_data))
+      optimizer = tf.train.GradientDescentOptimizer(0.5)
+      grads = optimizer.compute_gradients(self.loss)
+      self.train = optimizer.apply_gradients(grads)
 
-  # Create a neural net policy. Note that we create the neural net inside its
-  # own graph. This can help avoid variable name collisions. It shouldn't
-  # matter in this example, but if you create a neural net inside of a remote
-  # function, and multiple tasks execute that remote function on the same
-  # worker, then this can lead to variable name collisions.
-  with tf.Graph().as_default():
-    sess = tf.Session()
-    if preprocessor.shape is None:
-      preprocessor.shape = env.observation_space.shape
-    policy = ProximalPolicyLoss(env.observation_space, env.action_space,
-                                preprocessor, config, sess)
-    observation_filter = MeanStdFilter(preprocessor.shape, clip=None)
-    reward_filter = MeanStdFilter((), clip=None)
-    sess.run(tf.global_variables_initializer())
+      init = tf.global_variables_initializer()
+      self.sess = tf.Session()
 
-  # Note that directly making this function a remote function will give a
-  # pickling error. That happens because when we define a remote function, we
-  # pickle the function definition and ship the definition to the workers.
-  # However, this function uses "policy", which is a TensorFlow neural net, and
-  # TensorFlow often cannot be pickled. This could be addressed by constructing
-  # "policy" within the rollout function, but in this case it's better to
-  # create an actor that creates the policy in its constructor (so that we can
-  # reuse the policy between multiple calls to "rollout").
-  def rollout():
-    # Collect some rollouts.
-    trajectory = rollouts(policy, env, horizon, observation_filter,
-                          reward_filter)
-    add_advantage_values(trajectory, gamma, lam, reward_filter)
-    return trajectory
+      self.sess.run(init)
 
-  # Do some rollouts to make sure that all of the neural nets have been
-  # constructed. This isn't relevant for the serial code, but when we create
-  # the neural nets in the background using actors, we don't want the time to
-  # create the actors to interfere with the timing measurement below. Make sure
-  # that this code uses all of the actors.
-  collected_rollouts = [rollout() for _ in range(20)]
+    def set_weights(self, weights):
+      raise NotImplementedError
 
-  start_time = time.time()
+    def get_weights(self):
+      raise NotImplementedError
 
-  # Do some rollouts serially. These should be done in parallel.
-  collected_rollouts = [rollout() for _ in range(20)]
+  # Create a few actors with the model.
+  actors = [SimpleModel.remote() for _ in range(4)]
 
-  end_time = time.time()
-  duration = end_time - start_time
+  # Get the weights from the actors.
+  # EXERCISE: FILL THIS IN.
+  raise Exception("Implement this.")
 
-  expected_duration = np.ceil(20 / psutil.cpu_count()) * 0.5
-  assert duration < expected_duration, ("Rollouts took {} seconds. This is "
-                                        "too slow.".format(duration))
+  # Average the weights.
+  # EXERCISE: FILL THIS IN.
+  raise Exception("Implement this.")
 
-  print("Success! The example took {} seconds.".format(duration))
+  # Set the average weights on the actors.
+  # EXERCISE: FILL THIS IN.
+  raise Exception("Implement this.")
+
+  print("Success! The example ran to completion.")

@@ -67,17 +67,14 @@ on `using actors`_.
 **Exercise 8:** Use ``ray.put`` to avoid serializing and copying the same
 object into shared memory multiple times.
 
-**Exercise 9:** Use ``ray.register_class`` to enable Ray to serialize custom
-classes.
-
-**Exercise 10:** Parallelize a serial example that uses a neural net to perform
+**Exercise 9:** Parallelize a serial example that uses a neural net to perform
 rollouts in a gym environment.
 
-**Exercise 11:** Extract neural network weights from an actor on one process,
+**Exercise 10:** Extract neural network weights from an actor on one process,
 and set them in another actor. You may want to read the documentation on
 `using Ray with TensorFlow`_.
 
-**Exercise 12:** Specify that an actor requires some GPUs. For a complete
+**Exercise 11:** Specify that an actor requires some GPUs. For a complete
 example that does something similar, you may want to see the `ResNet example`_.
 
 .. _`Ray documentation`: http://ray.readthedocs.io/en/latest/?badge=latest
