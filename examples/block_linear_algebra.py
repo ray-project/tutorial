@@ -22,11 +22,6 @@ class BlockMatrix(object):
     self.block_ids = np.empty(self.num_blocks, dtype=object)
 
 
-# Note that we need to call ray.register_class so that we can pass BlockMatrix
-# objects to remote functions and return them from remote functions.
-ray.register_class(BlockMatrix)
-
-
 # This is a helper function which creates an array of zeros.
 @ray.remote
 def zeros_helper(shape):

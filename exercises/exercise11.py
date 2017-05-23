@@ -1,52 +1,26 @@
-# The goal of this exercise is to show how to send neural network weights
-# between workers and the driver.
+# The goal of this exercise is to show how to use GPUs with actors.
 #
-# Since pickling and unpickling a TensorFlow graph can be inefficient or may
-# not work at all, it is most efficient to ship the weights between processes
-# as a dictionary of numpy arrays.
+# We can indicate that an actor requires a single GPU as follows.
 #
-# We provide the helper class ray.experimental.TensorFlowVariables to help with
-# get and set weights. Similar techniques should work other neural net
-# libraries.
+#     @ray.remote(num_gpus=1)
+#     class Foo(object):
+#       pass
 #
-# Consider the following neural net definition.
+# Then inside of the actor constructor and methods, we can get the IDs of the
+# GPUs allocated for that actor with ray.get_gpu_ids().
 #
-#     import tensorflow as tf
+# EXERCISE: Modify this class to make it an actor.
 #
-#     x_data = tf.placeholder(tf.float32, shape=[100])
-#     y_data = tf.placeholder(tf.float32, shape=[100])
+# EXERCISE: Make the actor require a single GPU, and place the neural net on
+# the GPU. This should still work even if you run this on a machine with no
+# GPUs because we set allow_soft_placement=True below. To get this to work on a
+# machine with multiple GPUs, you will probably need to set the environment
+# variable CUDA_VISIBLE_DEVICES properly from within Python (before you create
+# the TensorFlow session object).
 #
-#     w = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
-#     b = tf.Variable(tf.zeros([1]))
-#     y = w * x_data + b
-#
-#     loss = tf.reduce_mean(tf.square(y - y_data))
-#     optimizer = tf.train.GradientDescentOptimizer(0.5)
-#     grads = optimizer.compute_gradients(loss)
-#     train = optimizer.apply_gradients(grads)
-#
-#     init = tf.global_variables_initializer()
-#     sess = tf.Session()
-#     sess.run(init)
-#
-# Then we can use the helper class as follows.
-#
-#     variables = ray.experimental.TensorFlowVariables(loss, sess)
-#     weights = variables.get_weights()
-#     variables.set_weights(weights)
-#
-# Note that there are analogous methods "variables.get_flat" and
-# "variables.set_flat", which concatenate the weights as a single array insead
-# of a dictionary.
-#
-# EXERCISE: Use the ray.experimental.TensorFlowVariables helper class to
-# implement the set_weights and get_weights methods for the actor so that the
-# driver can retrieve the weights from the actor and set new weights on the
-# actor.
-#
-# EXERCISE: Additionally, use the actor methods to retrieve the neural net
-# weights from all the actors, then average the weights, and then set the
-# average on all of the actors.
+# EXERCISE: Create one actor for each GPU, and verify that they are placed on
+# different GPUs.
+
 
 from __future__ import absolute_import
 from __future__ import division
@@ -57,60 +31,90 @@ import ray
 import tensorflow as tf
 import time
 
-from ray_tutorial.reinforce.env import BatchedEnv
-from ray_tutorial.reinforce.policy import ProximalPolicyLoss
-from ray_tutorial.reinforce.filter import MeanStdFilter
-from ray_tutorial.reinforce.rollout import rollouts, add_advantage_values
-
-from ray_tutorial.reinforce.env import (NoPreprocessor, AtariRamPreprocessor,
-                                        AtariPixelPreprocessor)
-from ray_tutorial.reinforce.models.fc_net import fc_net
-from ray_tutorial.reinforce.models.vision_net import vision_net
-
 
 if __name__ == "__main__":
-  ray.init(num_cpus=4, redirect_output=True)
+  # Start Ray, note that we pass in num_gpus=4. Ray will assume this machine
+  # has 4 GPUs (even if it does not). When a task or actor requests a GPU, it
+  # will be assigned a GPU ID from the set [0, 1, 2, 3]. It is then the
+  # responsibility of the task or actor to make sure that it only uses that
+  # specific GPU (e.g., by setting the CUDA_VISIBLE_DEVICES environment
+  # variable).
+  ray.init(num_cpus=4, num_gpus=4, redirect_output=True)
 
-  # This actor contains a simple neural network.
-  @ray.actor
-  class SimpleModel(object):
-    def __init__(self):
-      x_data = tf.placeholder(tf.float32, shape=[100])
-      y_data = tf.placeholder(tf.float32, shape=[100])
+  # This is a class with a simple neural net. Make this an actor and make it
+  # require a single GPU.
+  class Network(object):
+    def __init__(self, x, y):
+      # You should be able to access the GPU IDs in here, and set
+      # CUDA_VISIBLE_DEVICES appropriately to control which GPUs TensorFlow
+      # uses.
+      assert len(ray.get_gpu_ids()) == 1
+      with tf.device("/cpu:0"):
+        # NOTE: We create each network inside a separate graph. Doing this can
+        # be critical for avoiding variable name collisions.
+        with tf.Graph().as_default():
+          # Define the inputs.
+          x_data = tf.constant(x, dtype=tf.float32)
+          y_data = tf.constant(y, dtype=tf.float32)
+          # Define the weights and computation.
+          w = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
+          b = tf.Variable(tf.zeros([1]))
+          y = w * x_data + b
+          # Define the loss.
+          self.loss = tf.reduce_mean(tf.square(y - y_data))
+          optimizer = tf.train.GradientDescentOptimizer(0.5)
+          self.grads = optimizer.compute_gradients(self.loss)
+          self.train = optimizer.apply_gradients(self.grads)
+          # Define the weight initializer and session.
+          init = tf.global_variables_initializer()
+          # By setting allow_soft_placement=True, we allow this code to run
+          # even if the machine has no GPUs.
+          config = tf.ConfigProto(allow_soft_placement=True)
+          self.sess = tf.Session(config=config)
+          # Additional code for setting and getting the weights
+          self.variables = ray.experimental.TensorFlowVariables(self.loss,
+                                                                self.sess)
+          # Return all of the data needed to use the network.
+          self.sess.run(init)
 
-      w = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
-      b = tf.Variable(tf.zeros([1]))
-      y = w * x_data + b
-
-      self.loss = tf.reduce_mean(tf.square(y - y_data))
-      optimizer = tf.train.GradientDescentOptimizer(0.5)
-      grads = optimizer.compute_gradients(self.loss)
-      self.train = optimizer.apply_gradients(grads)
-
-      init = tf.global_variables_initializer()
-      self.sess = tf.Session()
-
-      self.sess.run(init)
-
-    def set_weights(self, weights):
-      raise NotImplementedError
+    # Define a remote function that trains the network for one step and returns
+    # the new weights.
+    def step(self, weights):
+      # Set the weights in the network.
+      self.variables.set_weights(weights)
+      # Do one step of training. We only need the actual gradients so we filter
+      # over the list.
+      actual_grads = self.sess.run([grad[0] for grad in self.grads])
+      return actual_grads
 
     def get_weights(self):
-      raise NotImplementedError
+      return self.variables.get_weights()
 
-  # Create a few actors with the model.
-  actors = [SimpleModel() for _ in range(4)]
+    def get_gpu_ids(self):
+      return ray.get_gpu_ids()
 
-  # Get the weights from the actors.
-  # EXERCISE: FILL THIS IN.
-  raise Exception("Implement this.")
+  num_data = 1000
+  x_data = np.random.rand(num_data)
+  y_data = x_data * 0.1 + 0.3
 
-  # Average the weights.
-  # EXERCISE: FILL THIS IN.
-  raise Exception("Implement this.")
+  # EXERCISE: Note that when you make Network an actor and you pass x_data and
+  # y_data (which are both numpy arrays) into the Network constructor, every
+  # time you create a new Network actor, x_data and y_data will be serialized
+  # and put in the object store. In order to place them in the object store
+  # only once, you can use call ray.put on the objects and pass the resulting
+  # object IDs into the Network constructor.
+  actors = [Network(x_data, y_data) for _ in range(4)]
 
-  # Set the average weights on the actors.
-  # EXERCISE: FILL THIS IN.
-  raise Exception("Implement this.")
+  # Get the weights of the first actor.
+  weights = actors[0].get_weights()
+
+  # Do a training step on each actor.
+  [actor.step(weights) for actor in actors]
+
+  # Check that the GPU IDs are different.
+  gpu_ids = []
+  for actor in actors:
+    gpu_ids += actor.get_gpu_ids()
+  assert set(gpu_ids) == set(range(4))
 
   print("Success! The example ran to completion.")
