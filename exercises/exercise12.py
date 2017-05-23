@@ -2,7 +2,7 @@
 #
 # We can indicate that an actor requires a single GPU as follows.
 #
-#     @ray.actor(num_gpus=1)
+#     @ray.remote(num_gpus=1)
 #     class Foo(object):
 #       pass
 #

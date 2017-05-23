@@ -72,7 +72,7 @@ if __name__ == "__main__":
   ray.init(num_cpus=4, redirect_output=True)
 
   # This actor contains a simple neural network.
-  @ray.actor
+  @ray.remote
   class SimpleModel(object):
     def __init__(self):
       x_data = tf.placeholder(tf.float32, shape=[100])
@@ -99,7 +99,7 @@ if __name__ == "__main__":
       raise NotImplementedError
 
   # Create a few actors with the model.
-  actors = [SimpleModel() for _ in range(4)]
+  actors = [SimpleModel.remote() for _ in range(4)]
 
   # Get the weights from the actors.
   # EXERCISE: FILL THIS IN.
