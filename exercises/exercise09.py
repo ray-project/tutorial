@@ -105,7 +105,7 @@ if __name__ == "__main__":
   end_time = time.time()
   duration = end_time - start_time
 
-  expected_duration = np.ceil(20 / psutil.cpu_count()) * 0.5
+  expected_duration = np.ceil(20 / psutil.cpu_count(logical=False)) * 0.5
   assert duration < expected_duration, ("Rollouts took {} seconds. This is "
                                         "too slow.".format(duration))
 
