@@ -69,7 +69,7 @@ class Policy:
 
     # === Rollouts/training ===
 
-    def rollout(self, env, *, render=False, timestep_limit=None, save_obs=False, random_stream=None):
+    def rollout(self, env, render=False, timestep_limit=None, save_obs=False, random_stream=None):
         """
         If random_stream is provided, the rollout will take noisy actions with noise drawn from that stream.
         Otherwise, no action noise will be added.
