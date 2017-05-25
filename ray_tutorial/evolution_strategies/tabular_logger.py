@@ -80,10 +80,11 @@ def dump_tabular():
     """
     _Logger.CURRENT.dump_tabular()
 
-def log(*args, level=INFO):
+def log(*args, **kwargs):
     """
     Write the sequence of args, with no separators, to the console and output files (if you've configured an output file).
     """
+    level = kwargs['level'] if 'level' in kwargs else INFO
     _Logger.CURRENT.log(*args, level=level)
 
 def debug(*args):
@@ -158,7 +159,8 @@ class _Logger(object):
         if self.tbwriter is not None:
             self.tbwriter.write_values(self.name2val)
             self.name2val.clear()
-    def log(self, *args, level=INFO):
+    def log(self, *args, **kwargs):
+        level = kwargs['level'] if 'level' in kwargs else INFO
         if self.level <= level:
             self._do_log(*args)
 
@@ -176,7 +178,7 @@ class _Logger(object):
     # Misc
     # ----------------------------------------
     def _do_log(self, *args):
-        self._write_text(*args, '\n')
+        self._write_text(*args + ('\n',))
         for f in self.text_outputs:
             try: f.flush()
             except OSError: print('Warning! OSError when flushing.')
