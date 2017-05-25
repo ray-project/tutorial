@@ -37,7 +37,7 @@ if __name__ == "__main__":
     return results
 
   # Sleep a little to improve the accuracy of the timing measurements below.
-  time.sleep(2.0)
+  time.sleep(4.0)
   start_time = time.time()
 
   # Run two experiments. These could be done in parallel.
