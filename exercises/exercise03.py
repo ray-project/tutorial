@@ -56,5 +56,8 @@ if __name__ == "__main__":
   assert duration < 0.1 + 1.5 + 0.3, ("FAILURE: The data generation and "
                                       "aggregation took {} seconds. This is "
                                       "too slow".format(duration))
+  assert duration > 0.1 + 1.5, ("FAILURE: The data generation and "
+                                "aggregation took {} seconds. This is "
+                                "too fast".format(duration))
 
   print("Success! The example took {} seconds.".format(duration))
