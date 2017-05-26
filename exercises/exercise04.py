@@ -49,7 +49,9 @@ if __name__ == "__main__":
 
   assert sum(experiment1) == 50
   assert sum(experiment2) == 50
-  assert duration < 0.35, ("The experiments ran in {} seconds. This is too "
-                          "slow.".format(duration))
+  assert duration < 0.37, ("The experiments ran in {} seconds. This is too "
+                           "slow.".format(duration))
+  assert duration > 0.3, ("The experiments ran in {} seconds. This is too "
+                          "fast.".format(duration))
 
   print("Success! The example took {} seconds.".format(duration))
