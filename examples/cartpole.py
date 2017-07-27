@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 import gym
 import tensorflow as tf
@@ -9,12 +11,13 @@ n_actions = 2          # number of available actions
 learning_rate = 1e-2   # how rapidly to update parameters
 gamma = .9             # reward discount factor
 
-env = gym.make("CartPole-v1")
+env = gym.make("CartPole-v0")
 observation = env.reset()
 observations, rewards, labels = [], [], []
-running_reward = 10    # worst case is ~10 for cartpole
 reward_sum = 0
+reward_sums = []
 episode_number = 0
+num_timesteps = 0
 max_steps = 1000
 
 def discounted_normalized_rewards(r):
@@ -43,6 +46,10 @@ train_op = optimizer.minimize(loss, grad_loss=input_reward)
 sess = tf.InteractiveSession()
 tf.initialize_all_variables().run()
 
+num_timesteps = 0
+
+start_time = time.time()
+
 # Tralining loop
 while episode_number <= max_steps:
 
@@ -60,7 +67,13 @@ while episode_number <= max_steps:
     rewards.append(reward)
 
     if done:
-        running_reward = running_reward * 0.99 + reward_sum * 0.01
+        timesteps = len(rewards)
+
+        if (num_timesteps + timesteps) // 5000 > num_timesteps // 5000:
+            print('time: {:4.1f}, timesteps: {:7.0f}, reward: {:7.3f}'.format(
+                time.time() - start_time, num_timesteps + timesteps, np.mean(reward_sums)))
+
+        num_timesteps += timesteps
 
         feed = {input_observation: np.vstack(observations),
                 input_reward: discounted_normalized_rewards(np.vstack(rewards)),
@@ -68,10 +81,7 @@ while episode_number <= max_steps:
         sess.run(train_op, feed)
         observations, rewards, labels = [], [], [] # Reset history.
 
-        if episode_number % 25 == 0:
-            print('ep: {}, reward: {}, mean reward: {:3f}'.format(
-                episode_number, reward_sum, running_reward))
-
         episode_number += 1
         observation = env.reset()
+        reward_sums.append(reward_sum)
         reward_sum = 0
