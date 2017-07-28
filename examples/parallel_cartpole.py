@@ -7,16 +7,16 @@ import tensorflow as tf
 import tensorflow.contrib.slim as slim
 
 n_obs = 4              # dimensionality of observations
-n_h = 128              # number of hidden layer neurons
+n_h = 256              # number of hidden layer neurons
 n_actions = 2          # number of available actions
-learning_rate = 1e-2   # how rapidly to update parameters
-gamma = .9             # reward discount factor
+learning_rate = 5e-4   # how rapidly to update parameters
+gamma = .99            # reward discount factor
 
 ray.init()
 
 def make_policy(observation_placeholder):
     hidden = slim.fully_connected(observation_placeholder, n_h)
-    log_probability = slim.fully_connected(hidden, n_actions, activation_fn=None)
+    log_probability = slim.fully_connected(hidden, n_actions, activation_fn=None, weights_initializer=tf.truncated_normal_initializer(0.001))
     return tf.nn.softmax(log_probability)
 
 def discounted_normalized_rewards(r):

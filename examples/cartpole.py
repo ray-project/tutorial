@@ -6,10 +6,10 @@ import tensorflow as tf
 import tensorflow.contrib.slim as slim
 
 n_obs = 4              # dimensionality of observations
-n_h = 128              # number of hidden layer neurons
+n_h = 256              # number of hidden layer neurons
 n_actions = 2          # number of available actions
-learning_rate = 1e-2   # how rapidly to update parameters
-gamma = .9             # reward discount factor
+learning_rate = 5e-4   # how rapidly to update parameters
+gamma = .99            # reward discount factor
 
 env = gym.make("CartPole-v0")
 observation = env.reset()
@@ -18,7 +18,6 @@ reward_sum = 0
 reward_sums = []
 episode_number = 0
 num_timesteps = 0
-max_steps = 1000
 
 def discounted_normalized_rewards(r):
   """Take 1D float array of rewards and compute normalized discounted reward."""
@@ -35,7 +34,7 @@ input_reward = tf.placeholder(dtype=tf.float32, shape=[None,1])
 
 # The policy network.
 hidden = slim.fully_connected(input_observation, n_h)
-log_probability = slim.fully_connected(hidden, n_actions, activation_fn=None)
+log_probability = slim.fully_connected(hidden, n_actions, activation_fn=None, weights_initializer=tf.truncated_normal_initializer(0.001))
 action_probability = tf.nn.softmax(log_probability)
 
 loss = tf.nn.l2_loss(input_probability - action_probability)
@@ -50,8 +49,8 @@ num_timesteps = 0
 
 start_time = time.time()
 
-# Tralining loop
-while episode_number <= max_steps:
+# Training loop
+while True:
 
     # stochastically sample a policy from the network
     probability = sess.run(action_probability, {input_observation: observation[np.newaxis, :]})[0,:]
