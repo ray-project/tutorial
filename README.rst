@@ -4,30 +4,30 @@ Ray Tutorial
 Setup
 -----
 
-1. **Install Ray** by following the `Ray installation instructions`_. Verify
-   that the following works.
+1. Make sure you have Python installed (we recommend using the `Anaconda Python
+   distribution`..)
+
+.. _`Anaconda Python distribution`: https://www.continuum.io/downloads
+
+2. **Install Jupyter** with ``pip install jupyter``. Verify that you can start
+  a Jupyter notebook with the command ``jupyter-notebook``.
+
+3. **Install Ray** by running ``pip install ray``. Verify that you can run
 
   .. code-block:: bash
 
-    python ray/test/runtest.py
+    import ray
+    ray.init()
 
+  in a Python interpreter.
 
-2. Clone the tutorial repository with
+4. Clone the tutorial repository with
 
   .. code-block:: bash
 
     git clone https://github.com/ray-project/tutorial.git
 
-3. Install the tutorial package with
-
-  .. code-block:: bash
-
-    cd tutorial
-    python setup.py install
-
-.. _`Ray installation instructions`: http://ray.readthedocs.io/en/latest/index.html
-
-4. Install the following additional dependencies.
+5. Install the following additional dependencies.
 
   .. code-block:: bash
 
@@ -84,22 +84,14 @@ example that does something similar, you may want to see the `ResNet example`_.
 .. _`ResNet example`: http://ray.readthedocs.io/en/latest/example-resnet.html
 
 
-Longer Examples
----------------
+RL Exercises
+------------
 
-Now that you've completed the basic exercises, some more involved exercises are
-provided under ``examples/``.
+Each file in ``rl_exercises/rl_exercise*.ipynb`` is a separate Jupyter notebook.
+These exercises should be done in order. They can be opened in a jupyter
+notebook by running the following commands.
 
-**Block Distributed Matrix Algorithms:** Implement a distributed matrix
-multiplication algorithm for block distributed matrices. For this example, run
-``python examples/block_linear_algebra.py``.
+.. code-block:: bash
 
-**Hyperparameter Search:** Here, a serial implementation of random
-hyperparameter search is provided. Modify this example to parallelize the
-hyperparameter search and to start a new experiment whenever one finishes. For
-this example, run ``python examples/hyperparameter_search.py``.
-
-**Evolutionary Algorithms:** Here, a serial implementation of an evolutionary
-algorithm for solving reinforcement learning problems is provided. Modify this
-example to parallelize the implementation. For this example, run
-``python examples/evolution_strategies.py``.
+  cd rl_exercises
+  jupyter-notebook
