@@ -103,6 +103,5 @@ while True:
         print('time: {:4.1f}, timesteps: {:7.0f}, reward: {:7.3f}'.format(
             time.time() - start_time, num_timesteps + timesteps, np.mean(reward_sums)))
     num_timesteps += timesteps
-    # print("time is", time.time() - start_time, "mean episode length is ", mean_length)
     results = [np.concatenate(x) for x in zip(*trajectories)]
     sess.run(train_op, {input_observation: results[0], input_reward: results[1], input_probability: results[2]})

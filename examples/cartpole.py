@@ -19,6 +19,11 @@ reward_sums = []
 episode_number = 0
 num_timesteps = 0
 
+def make_policy(observation_placeholder):
+    hidden = slim.fully_connected(observation_placeholder, n_h)
+    log_probability = slim.fully_connected(hidden, n_actions, activation_fn=None, weights_initializer=tf.truncated_normal_initializer(0.001))
+    return tf.nn.softmax(log_probability)
+
 def discounted_normalized_rewards(r):
   """Take 1D float array of rewards and compute normalized discounted reward."""
   result = np.zeros_like(r)
@@ -33,9 +38,7 @@ input_probability = tf.placeholder(dtype=tf.float32, shape=[None, n_actions])
 input_reward = tf.placeholder(dtype=tf.float32, shape=[None,1])
 
 # The policy network.
-hidden = slim.fully_connected(input_observation, n_h)
-log_probability = slim.fully_connected(hidden, n_actions, activation_fn=None, weights_initializer=tf.truncated_normal_initializer(0.001))
-action_probability = tf.nn.softmax(log_probability)
+action_probability = make_policy(input_observation)
 
 loss = tf.nn.l2_loss(input_probability - action_probability)
 optimizer = tf.train.AdamOptimizer(learning_rate)
