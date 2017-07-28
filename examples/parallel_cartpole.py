@@ -1,3 +1,5 @@
+# In this Exercise we will parallelize the example cartpole.py
+
 import time
 
 import gym
@@ -28,10 +30,17 @@ def discounted_normalized_rewards(r):
         result[t] = running_sum
     return (result - np.mean(result)) / np.std(result)
 
-@ray.remote
+# EXERCISE: Make the Agent class an actor and fill in the __init__
+# as well as the rollout methods.
 class Agent(object):
 
+    # EXERCISE: Create the CartPole-v1 environment as self.env,
+    # create placeholders for the input observation, set up the action_probability
+    # network, create a tensorflow Session, initialize the variables and
+    # create a TensorFlowVariables objects that can be used to read and
+    # write the variables of the policy.
     def __init__(self):
+        #
         self.env = gym.make("CartPole-v1")
 
         self.input_observation = tf.placeholder(dtype=tf.float32, shape=[None, n_obs])
@@ -45,6 +54,7 @@ class Agent(object):
 
         self.variables = ray.experimental.TensorFlowVariables(self.action_probability, self.sess)
 
+    # EXERCISE: Write the function to load the weights into the policy here.
     def load_weights(self, weights):
         self.variables.set_weights(weights)
 
@@ -54,22 +64,17 @@ class Agent(object):
         observation = self.env.reset()
 
         while not done:
-            # stochastically sample a policy from the network
-            probability = self.sess.run(self.action_probability, {self.input_observation: observation[np.newaxis, :]})[0,:]
 
-            action = np.random.choice(n_actions, p = probability)
-            label = np.zeros_like(probability) ; label[action] = 1
-            observations.append(observation)
-            labels.append(label)
-
-            observation, reward, done, info = self.env.step(action)
-
-            rewards.append(reward)
+            # EXERCISE:
+            # Write the part that evaluates the policy and appends
+            # the current observation to observations, the reward to rewards and
+            # the target label to labels.
 
         return np.vstack(observations), discounted_normalized_rewards(np.vstack(rewards)), np.vstack(labels)
 
 
-agents = [Agent.remote() for i in range(4)]
+
+agents = # EXERCISE: Create 4 remote Agents here
 
 input_observation = tf.placeholder(dtype=tf.float32, shape=[None, n_obs])
 input_probability = tf.placeholder(dtype=tf.float32, shape=[None, n_actions])
@@ -88,6 +93,7 @@ variables = ray.experimental.TensorFlowVariables(loss, sess)
 num_timesteps = 0
 reward_sums = []
 
+# Barrier for the timing (TODO(pcm): clean this up)
 weights = ray.put(variables.get_weights())
 ray.get([agent.load_weights.remote(weights) for agent in agents])
 
