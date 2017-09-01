@@ -32,10 +32,17 @@ Setup
 
       pip install tensorflow
       pip install gym
+      pip install scipy
+      pip install smart_open
+      pip install opencv-python
+      pip install bokeh
+      pip install ipywidgets==6.0.0
 
    Verify that you can run ``import tensorflow`` and ``import gym`` in a Python
    interpreter.
 
+   **Note:** If you have trouble installing these Python modules, note that
+   almost all of the exercises can be done without them.
 
 Exercises
 ---------
@@ -75,12 +82,12 @@ on `using actors`_.
 **Exercise 8:** Use ``ray.put`` to avoid serializing and copying the same
 object into shared memory multiple times.
 
-**Exercise 9:** Extract neural network weights from an actor on one process,
+**Exercise 9:** Specify that an actor requires some GPUs. For a complete
+example that does something similar, you may want to see the `ResNet example`_.
+
+**Exercise 10:** Extract neural network weights from an actor on one process,
 and set them in another actor. You may want to read the documentation on
 `using Ray with TensorFlow`_.
-
-**Exercise 10:** Specify that an actor requires some GPUs. For a complete
-example that does something similar, you may want to see the `ResNet example`_.
 
 .. _`Anaconda Python distribution`: https://www.continuum.io/downloads
 .. _`Ray documentation`: http://ray.readthedocs.io/en/latest/?badge=latest
