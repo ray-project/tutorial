@@ -33,7 +33,6 @@ Setup
       pip install tensorflow
       pip install gym
       pip install scipy
-      pip install smart_open
       pip install opencv-python
       pip install bokeh
       pip install ipywidgets==6.0.0
@@ -54,6 +53,8 @@ opened in a Jupyter notebook by running the following commands.
 
   cd tutorial/exercises
   jupyter-notebook
+
+If it asks for a password, just hit enter.
 
 Instructions are written in each file. To do each exercise, first run all of
 the cells in the Jupyter notebook. Then modify the ones that need to be modified
