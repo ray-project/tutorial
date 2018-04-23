@@ -90,6 +90,9 @@ example that does something similar, you may want to see the `ResNet example`_.
 and set them in another actor. You may want to read the documentation on
 `using Ray with TensorFlow`_.
 
+**Exercise 11:** Pass actor handles to tasks so that multiple tasks can invoke
+methods on the same actor.
+
 .. _`Anaconda Python distribution`: https://www.continuum.io/downloads
 .. _`Ray documentation`: http://ray.readthedocs.io/en/latest/?badge=latest
 .. _`documentation for wait`: http://ray.readthedocs.io/en/latest/api.html#waiting-for-a-subset-of-tasks-to-finish.
