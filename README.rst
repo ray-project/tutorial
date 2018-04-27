@@ -33,7 +33,6 @@ Setup
       pip install tensorflow
       pip install gym
       pip install scipy
-      pip install smart_open
       pip install opencv-python
       pip install bokeh
       pip install ipywidgets==6.0.0
@@ -54,6 +53,8 @@ opened in a Jupyter notebook by running the following commands.
 
   cd tutorial/exercises
   jupyter-notebook
+
+If it asks for a password, just hit enter.
 
 Instructions are written in each file. To do each exercise, first run all of
 the cells in the Jupyter notebook. Then modify the ones that need to be modified
@@ -79,13 +80,19 @@ See the `documentation for wait`_.
 **Exercise 7:** Use actors to share state between tasks. See the documentation
 on `using actors`_.
 
-**Exercise 8:** Use ``ray.put`` to avoid serializing and copying the same
+**Exercise 8:** Pass actor handles to tasks so that multiple tasks can invoke
+methods on the same actor.
+
+**Exercise 9:** Use ``ray.put`` to avoid serializing and copying the same
 object into shared memory multiple times.
 
-**Exercise 9:** Specify that an actor requires some GPUs. For a complete
+**Exercise 10:** Specify that an actor requires some GPUs. For a complete
 example that does something similar, you may want to see the `ResNet example`_.
 
-**Exercise 10:** Extract neural network weights from an actor on one process,
+**Exercise 11:** Specify that a remote function requires certain custom
+resources. See the documentation on `custom resources`_.
+
+**Exercise 12:** Extract neural network weights from an actor on one process,
 and set them in another actor. You may want to read the documentation on
 `using Ray with TensorFlow`_.
 
@@ -95,7 +102,15 @@ and set them in another actor. You may want to read the documentation on
 .. _`using actors`: http://ray.readthedocs.io/en/latest/actors.html
 .. _`using Ray with TensorFlow`: http://ray.readthedocs.io/en/latest/using-ray-with-tensorflow.html
 .. _`ResNet example`: http://ray.readthedocs.io/en/latest/example-resnet.html
+.. _`custom resources`: http://ray.readthedocs.io/en/latest/resources.html#custom-resources
 
+
+More In-Depth Examples
+----------------------
+
+**Sharded Parameter Server:** This exercise involves implementing a parameter
+server as a Ray actor, implementing a simple asynchronous distributed training
+algorithm, and sharding the parameter server to improve throughput.
 
 RL Exercises
 ------------
