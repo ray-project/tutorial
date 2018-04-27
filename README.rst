@@ -108,9 +108,9 @@ and set them in another actor. You may want to read the documentation on
 More In-Depth Examples
 ----------------------
 
-**Sharded Parameter Server:** This exercise involves implement a parameter
+**Sharded Parameter Server:** This exercise involves implementing a parameter
 server as a Ray actor, implementing a simple asynchronous distributed training
-algorithm, and shard the parameter server to improve throughput.
+algorithm, and sharding the parameter server to improve throughput.
 
 RL Exercises
 ------------
