@@ -105,6 +105,13 @@ and set them in another actor. You may want to read the documentation on
 .. _`custom resources`: http://ray.readthedocs.io/en/latest/resources.html#custom-resources
 
 
+More In-Depth Examples
+----------------------
+
+**Sharded Parameter Server:** This exercise involves implement a parameter
+server as a Ray actor, implementing a simple asynchronous distributed training
+algorithm, and shard the parameter server to improve throughput.
+
 RL Exercises
 ------------
 
