@@ -115,6 +115,9 @@ algorithm, and sharding the parameter server to improve throughput.
 **Speed Up Pandas:** This exercise involves using `Modin`_ to speed up your
 pandas workloads.
 
+**MapReduce:** This exercise shows how to implement a toy version of the
+MapReduce system on top of Ray.
+
 .. _`Modin`: https://modin.readthedocs.io/en/latest/
 
 RL Exercises
