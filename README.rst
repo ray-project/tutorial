@@ -112,6 +112,11 @@ More In-Depth Examples
 server as a Ray actor, implementing a simple asynchronous distributed training
 algorithm, and sharding the parameter server to improve throughput.
 
+**Speed Up Pandas:** This exercise involves using `Modin`_ to speed up your
+pandas workloads.
+
+.. _`Modin`: https://modin.readthedocs.io/en/latest/
+
 RL Exercises
 ------------
 
