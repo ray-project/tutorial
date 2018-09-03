@@ -11,7 +11,7 @@ Setup
 2. **Install Jupyter** with ``pip install jupyter``. Verify that you can start
    a Jupyter notebook with the command ``jupyter-notebook``.
 
-3. **Install Ray** by running ``pip install ray``. Verify that you can run
+3. **Install Ray** by running ``pip install -U ray``. Verify that you can run
 
     .. code-block:: bash
 
