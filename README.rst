@@ -44,7 +44,7 @@ Setup
    **Note:** If you have trouble installing these Python modules, note that
    almost all of the exercises can be done without them.
 
-6. If you want to run the pong exercise (in `rl_exercises/rl_exercise06.ipynb`),
+6. If you want to run the pong exercise (in `rl_exercises/rl_exercise05.ipynb`),
    you will need to do `pip install utilities/pong_py`.
 
 Exercises
