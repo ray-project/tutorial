@@ -44,6 +44,9 @@ Setup
    **Note:** If you have trouble installing these Python modules, note that
    almost all of the exercises can be done without them.
 
+6. If you want to run the pong exercise (in `rl_exercises/rl_exercise05.ipynb`),
+   you will need to do `pip install utilities/pong_py`.
+
 Exercises
 ---------
 
@@ -132,3 +135,14 @@ notebook by running the following commands.
 
   cd tutorial/rl_exercises
   jupyter-notebook
+
+**Exercise 1:** Introduction to Markov Decision Processes.
+
+**Exercise 2:** Derivative free optimization.
+
+**Exercise 3:** Introduction to proximal policy optimization (PPO).
+
+**Exercise 4:** Introduction to asynchronous advantage actor-critic (A3C).
+
+**Exercise 5:** Train a policy to play pong using RLlib. Deploy it using actors,
+and play against the trained policy.
