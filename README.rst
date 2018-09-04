@@ -66,35 +66,35 @@ in parallel.
 
 **Exercise 2:** Execute remote functions in parallel with some dependencies.
 
-**Exercise 3:** Pass object IDs into tasks to construct dependencies between
-tasks.
+**Exercise 3:** Call remote functions from within remote functions.
 
-**Exercise 4:** Call remote functions from within remote functions.
-
-**Exercise 5:** Use ``ray.wait`` to ignore stragglers. See the
+**Exercise 4:** Use ``ray.wait`` to ignore stragglers. See the
 `documentation for wait`_.
 
-**Exercise 6:** Use ``ray.wait`` to process tasks in the order that they finish.
+**Exercise 5:** Use ``ray.wait`` to process tasks in the order that they finish.
 See the `documentation for wait`_.
 
-**Exercise 7:** Use actors to share state between tasks. See the documentation
+**Exercise 6:** Use actors to share state between tasks. See the documentation
 on `using actors`_.
 
-**Exercise 8:** Pass actor handles to tasks so that multiple tasks can invoke
+**Exercise 7:** Pass actor handles to tasks so that multiple tasks can invoke
 methods on the same actor.
 
-**Exercise 9:** Use ``ray.put`` to avoid serializing and copying the same
+**Exercise 8:** Use ``ray.put`` to avoid serializing and copying the same
 object into shared memory multiple times.
 
-**Exercise 10:** Specify that an actor requires some GPUs. For a complete
+**Exercise 9:** Specify that an actor requires some GPUs. For a complete
 example that does something similar, you may want to see the `ResNet example`_.
 
-**Exercise 11:** Specify that a remote function requires certain custom
+**Exercise 10:** Specify that a remote function requires certain custom
 resources. See the documentation on `custom resources`_.
 
-**Exercise 12:** Extract neural network weights from an actor on one process,
+**Exercise 11:** Extract neural network weights from an actor on one process,
 and set them in another actor. You may want to read the documentation on
 `using Ray with TensorFlow`_.
+
+**Exercise 12:** Pass object IDs into tasks to construct dependencies between
+tasks and perform a tree reduce.
 
 .. _`Anaconda Python distribution`: https://www.continuum.io/downloads
 .. _`Ray documentation`: http://ray.readthedocs.io/en/latest/?badge=latest
