@@ -30,6 +30,7 @@ Setup
 
     .. code-block:: bash
 
+      pip install modin
       pip install tensorflow
       pip install gym
       pip install scipy
@@ -68,17 +69,17 @@ in parallel.
 
 **Exercise 3:** Call remote functions from within remote functions.
 
-**Exercise 4:** Use ``ray.wait`` to ignore stragglers. See the
-`documentation for wait`_.
-
-**Exercise 5:** Use ``ray.wait`` to process tasks in the order that they finish.
-See the `documentation for wait`_.
-
-**Exercise 6:** Use actors to share state between tasks. See the documentation
+**Exercise 4:** Use actors to share state between tasks. See the documentation
 on `using actors`_.
 
-**Exercise 7:** Pass actor handles to tasks so that multiple tasks can invoke
+**Exercise 5:** Pass actor handles to tasks so that multiple tasks can invoke
 methods on the same actor.
+
+**Exercise 6:** Use ``ray.wait`` to ignore stragglers. See the
+`documentation for wait`_.
+
+**Exercise 7:** Use ``ray.wait`` to process tasks in the order that they finish.
+See the `documentation for wait`_.
 
 **Exercise 8:** Use ``ray.put`` to avoid serializing and copying the same
 object into shared memory multiple times.
@@ -97,12 +98,12 @@ and set them in another actor. You may want to read the documentation on
 tasks and perform a tree reduce.
 
 .. _`Anaconda Python distribution`: https://www.continuum.io/downloads
-.. _`Ray documentation`: http://ray.readthedocs.io/en/latest/?badge=latest
-.. _`documentation for wait`: http://ray.readthedocs.io/en/latest/api.html#waiting-for-a-subset-of-tasks-to-finish.
-.. _`using actors`: http://ray.readthedocs.io/en/latest/actors.html
-.. _`using Ray with TensorFlow`: http://ray.readthedocs.io/en/latest/using-ray-with-tensorflow.html
-.. _`ResNet example`: http://ray.readthedocs.io/en/latest/example-resnet.html
-.. _`custom resources`: http://ray.readthedocs.io/en/latest/resources.html#custom-resources
+.. _`Ray documentation`: https://ray.readthedocs.io/en/latest/?badge=latest
+.. _`documentation for wait`: https://ray.readthedocs.io/en/latest/api.html#ray.wait
+.. _`using actors`: https://ray.readthedocs.io/en/latest/actors.html
+.. _`using Ray with TensorFlow`: https://ray.readthedocs.io/en/latest/using-ray-with-tensorflow.html
+.. _`ResNet example`: https://ray.readthedocs.io/en/latest/example-resnet.html
+.. _`custom resources`: https://ray.readthedocs.io/en/latest/resources.html#custom-resources
 
 
 More In-Depth Examples
