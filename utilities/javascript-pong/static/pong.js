@@ -80,6 +80,7 @@ Pong = {
   startDoublePlayer: function() {
     this.start(2);
   },
+  error: false,
 
   start: function(numPlayers) {
     if (!this.playing) {
@@ -89,6 +90,10 @@ Pong = {
       this.rightPaddle.setAuto(false, this.level(1));
       this.ball.reset();
       this.runner.hideCursor();
+      Pong.rpc(JSON.stringify({"command": "start_episode"}), function(episode_id) {
+          Pong.episode_id = episode_id;
+          console.log("Started episode", Pong.episode_id);
+      });
     }
   },
 
@@ -99,7 +104,12 @@ Pong = {
         this.leftPaddle.setAuto(false);
         this.rightPaddle.setAuto(false);
         this.runner.showCursor();
+        this.episode_id = null;
       }
+      Pong.rpc(JSON.stringify({"command": "end_episode", "episode_id": Pong.episode_id}),
+          function(episode_id) {
+              console.log("Ended episode", Pong.episode_id);
+          });
     }
   },
 
@@ -107,9 +117,45 @@ Pong = {
     return 8 + (this.scores[playerNo] - this.scores[playerNo ? 0 : 1]);
   },
 
+  rpc: function(data, callback) {
+      if (Pong.error) {
+          return;
+      }
+      console.log("Sending", data);
+      var predict_url = "/pong/predict";
+      if(window && window.location && window.location.hostname === "localhost") {
+        predict_url = "http://localhost:3000";
+      }
+
+      // Query Pong server
+      fetch(predict_url, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: new Headers({'Content-Type': 'application/json'}),
+        body: data
+      }).then(function(response) {
+        if (response.ok) {
+          response.json().then(callback);
+        } else {
+          console.log(response.status, response.statusText);
+        }
+      }).catch(function(error) {
+          if (!Pong.error) {
+              alert("Failed to get execute request, please refresh the page: " + data);
+          }
+          Pong.error = true;
+      });
+  },
+
   goal: function(playerNo) {
     this.sounds.goal();
     this.scores[playerNo] += 1;
+    Pong.rpc(
+        JSON.stringify(
+            {"command": "log_returns", "playerNo": playerNo, "episode_id": Pong.episode_id, "reward": 10}),
+        function(data) {
+            console.log("Logged point for player", playerNo);
+        });
     if (this.scores[playerNo] == 9) {
       this.menu.declareWinner(playerNo);
       this.stop();
@@ -449,7 +495,7 @@ Pong = {
       // features = [for (i of features) i / 500];
 
 
-      var data = JSON.stringify({'input': features});
+      var data = JSON.stringify({"episode_id": Pong.episode_id, "observation": features});
       // console.log(data);
       var self = this;
 
@@ -457,36 +503,30 @@ Pong = {
       if(window && window.location && window.location.hostname === "localhost") {
         predict_url = "http://localhost:3000";
       }
+      if (!Pong.episode_id) {
+          console.log("Dont have episode id yet, waiting");
+          return;
+      }
 
       // Query Pong server
-      fetch(predict_url, {
-        method: 'POST',
-        redirect: 'follow',
-        headers: new Headers({'Content-Type': 'application/json'}),
-        body: data
-      }).then(function(response) {
-        if (response.ok) {
-          response.json().then(function(data) {
-            if (data.output === 0) {
-              // console.log('Staying still');
-              self.stopMovingUp();
-              self.stopMovingDown();
-            } else if (data.output === 1) {
-              // console.log('Moving down');
-              self.stopMovingUp();
-              self.moveDown();
-            } else if (data.output === 2) {
-              // console.log('Moving up');
-              self.stopMovingDown();
-              self.moveUp();
-            } else {
-              // console.log(data.output, 'Unrecognized action. Not moving.');
-              self.stopMovingUp();
-              self.stopMovingDown();
-            }
-          });
+      Pong.rpc(data, function(data) {
+        console.log("Taking action", data);
+        if (data.output === 0) {
+          // console.log('Staying still');
+          self.stopMovingUp();
+          self.stopMovingDown();
+        } else if (data.output === 1) {
+          // console.log('Moving down');
+          self.stopMovingUp();
+          self.moveDown();
+        } else if (data.output === 2) {
+          // console.log('Moving up');
+          self.stopMovingDown();
+          self.moveUp();
         } else {
-          console.log(response.status, response.statusText);
+          // console.log(data.output, 'Unrecognized action. Not moving.');
+          self.stopMovingUp();
+          self.stopMovingDown();
         }
       });
     },
@@ -640,6 +680,14 @@ Pong = {
 
       var paddle = (pos.dx < 0) ? leftPaddle : rightPaddle;
       var pt = Pong.Helper.ballIntercept(this, paddle, pos.nx, pos.ny);
+      if (pt) {
+          Pong.rpc(
+            JSON.stringify(
+                {"command": "log_returns", "playerNo": pos.nx < 0 ? 0 : 1, "episode_id": Pong.episode_id, "reward": 1}),
+            function(data) {
+                console.log("Logged intercept for player", pos.nx < 0 ? 0 : 1);
+            });
+      }
 
       if (pt) {
         switch (pt.d) {
