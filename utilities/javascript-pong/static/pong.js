@@ -123,8 +123,12 @@ Pong = {
       }
       console.log("Sending", data);
       var predict_url = "/pong/predict";
-      if(window && window.location && window.location.hostname === "localhost") {
-        predict_url = "http://localhost:3000";
+      if(window && window.location) {
+          if (window.location.hostname === "localhost") {
+                predict_url = "http://localhost:3000";
+          } else if (window.location.hostname == "community.cloud.databricks.com") {
+              predict_url = "https://community.cloud.databricks.com" + window.location.pathname.replace(new RegExp("[0-9]+/$"), "3000/");
+          }
       }
 
       // Query Pong server
