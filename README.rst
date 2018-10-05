@@ -1,8 +1,15 @@
 Ray Tutorial
 ============
 
-Setup
------
+Try Ray on Binder (Experimental)
+--------------------------------
+
+Try the Ray tutorials online on `Binder`_.
+
+.. _`Binder`: https://mybinder.org/v2/gh/ray-project/tutorial/master
+
+Local Setup
+-----------
 
 1. Make sure you have Python installed (we recommend using the `Anaconda Python
    distribution`_). Ray works with both Python 2 and Python 3. If you are unsure
