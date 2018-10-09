@@ -6,7 +6,6 @@ dependencies:
   - bokeh
   - ipywidgets=6.0.0
   - tensorflow
-  - opencv
   - pip:
-    - ray
-    - gym
+    - ray[rllib]
+    - keras
