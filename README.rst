@@ -153,3 +153,18 @@ notebook by running the following commands.
 
 **Exercise 5:** Train a policy to play pong using RLlib. Deploy it using actors,
 and play against the trained policy.
+
+Tune Exercises
+------------
+
+Tune is a tool for distributed hyperparameter search. There is one tutorial notebook 
+for Tune: ``tune_exercises/Tune.ipynb``. Answers can be found in 
+``tune_exercises/Tune-Answers.ipynb``. The notebook can be opened in a Jupyter 
+notebook by running the following commands. 
+
+.. code-block:: bash
+
+  cd tutorial/tune_exercises
+  jupyter-notebook
+  
+**Note**: This notebook doesn't work on Jupyter Lab. 
