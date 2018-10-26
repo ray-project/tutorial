@@ -160,11 +160,11 @@ Tune Exercises
 Tune is a tool for distributed hyperparameter search. There is one tutorial notebook 
 for Tune: ``tune_exercises/Tune.ipynb``. Answers can be found in 
 ``tune_exercises/Tune-Answers.ipynb``. The notebook can be opened in a Jupyter 
-notebook by running the following commands. 
+notebook by running the following commands. **Note**: The Tune notebook
+has exercises that don't work on Jupyter Lab. 
 
 .. code-block:: bash
 
   cd tutorial/tune_exercises
   jupyter-notebook
   
-**Note**: This notebook doesn't work on Jupyter Lab. 
