@@ -1,16 +1,13 @@
 import numpy as np
 import os
 import scipy.ndimage as ndimage
-
+import itertools
+import logging
+import sys
 import keras
 from keras.datasets import mnist
 from keras.preprocessing.image import ImageDataGenerator
 from keras import backend as K
-import itertools
-
-import logging
-import sys
-# logging.basicConfig(stream=sys.stdout)
 
 def limit_threads(num_threads):
     K.set_session(
@@ -19,11 +16,11 @@ def limit_threads(num_threads):
                 intra_op_parallelism_threads=num_threads,
                 inter_op_parallelism_threads=num_threads)))
 
+    
 def shuffled(x, y):
     idx = np.r_[:x.shape[0]]
     np.random.shuffle(idx)
     return x[idx], y[idx]
- 
 
 
 def load_data(generator=True, num_batches=600):
@@ -75,15 +72,6 @@ def get_sorted_trials(trial_list, metric):
 def get_best_result(trial_list, metric):
     """Retrieve the last result from the best trial."""
     return {metric: get_best_trial(trial_list, metric).last_result[metric]}
-
-
-# def get_best_model_trainable(trainable, trial_list, metric):
-#     """Restore a model from the best trial given a trainable."""
-#     best_trial = get_best_trial(trial_list, metric)
-#     trainable = trainable(best_trial.config)
-#     assert best_trial.has_checkpoint()
-#     trainable.restore(best_trial._checkpoint.value)
-#     return trainable.model
 
 
 def get_best_model(model_creator, trial_list, metric):
@@ -138,6 +126,7 @@ def test_reporter(train_mnist_tune):
         print("Works!")
         return 1
     raise Exception("Didn't call reporter...")
+
     
 def evaluate(model, validation=True):
     train_data, val_data, train_labels, val_labels = load_data(generator=False)
