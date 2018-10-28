@@ -14,6 +14,18 @@ Local Setup
 1. Make sure you have Python installed (we recommend using the `Anaconda Python
    distribution`_). Ray works with both Python 2 and Python 3. If you are unsure
    which to use, then use Python 3.
+   
+   **If not using conda**, continue to step 2.
+   
+   **If using conda**, you can then run the following commands and skip the next 4 steps:
+   
+   .. code-block:: bash 
+   
+       git clone https://github.com/ray-project/tutorial
+       cd tutorial
+       conda env create -f environment.yml
+       conda activate ray-tutorial
+
 
 2. **Install Jupyter** with ``pip install jupyter``. Verify that you can start
    a Jupyter notebook with the command ``jupyter-notebook``.
