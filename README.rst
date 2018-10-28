@@ -56,6 +56,7 @@ Local Setup
       pip install opencv-python
       pip install bokeh
       pip install ipywidgets==6.0.0
+      pip install keras
 
    Verify that you can run ``import tensorflow`` and ``import gym`` in a Python
    interpreter.
