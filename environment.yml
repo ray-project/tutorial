@@ -10,3 +10,4 @@ dependencies:
     - ray[rllib]==0.5.3
     - keras
     - modin
+    - matplotlib
