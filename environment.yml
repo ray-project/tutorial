@@ -11,3 +11,4 @@ dependencies:
     - keras
     - modin
     - matplotlib
+    - redis==2.10.6
