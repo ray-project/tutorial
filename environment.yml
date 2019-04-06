@@ -11,3 +11,5 @@ dependencies:
     - keras
     - modin
     - matplotlib
+    - bs4
+    - lxml
