@@ -7,7 +7,8 @@ dependencies:
   - ipywidgets=6.0.0
   - tensorflow
   - pip:
-    - ray[rllib]==0.6.0
+    - ray[rllib]==0.6.5
     - keras
     - modin
     - matplotlib
+    - sklearn
