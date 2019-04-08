@@ -8,7 +8,7 @@ def load_jupyter_server_extension(nbapp):
     cwd = os.getcwd()
     with open("/tmp/webserver.log", "w") as f:
         f.write("working directory is " + str(cwd) + "\n")
-    os.chdir(os.path.join(cwd, "qreader"))
-    with open("/tmp/npm.out", "w") as npm_out:
-        with open("/tmp/npm.err", "w") as npm_err:
-            Popen(["npm", "run", "dev"], stdout=npm_out, stderr=npm_err)
+    os.chdir(os.path.join(cwd, "qreader", "dist"))
+    with open("/tmp/webserver.out", "w") as out:
+        with open("/tmp/webserver.err", "w") as err:
+            Popen(["python", "-m", "http.server"], stdout=out, stderr=err)
