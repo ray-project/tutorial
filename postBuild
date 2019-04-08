@@ -1,6 +1,8 @@
+git clone https://github.com/ray-project/qreader
+cd qreader; npm install
 # enable nbserverproxy
 jupyter serverextension enable --sys-prefix nbserverproxy
-# install the bokeh server extension so that
+# install the webserver extension so that
 # flask launches at startup
 mv webserverextension.py ${NB_PYTHON_PREFIX}/lib/python*/site-packages/
 # enable webserver extension
