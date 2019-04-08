@@ -6,6 +6,9 @@ dependencies:
   - bokeh
   - ipywidgets=6.0.0
   - tensorflow
+  - nbserverproxy
+  - atoma
+  - flask
   - pip:
     - ray[rllib]==0.6.0
     - keras
