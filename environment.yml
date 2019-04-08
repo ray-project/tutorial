@@ -7,7 +7,6 @@ dependencies:
   - ipywidgets=6.0.0
   - tensorflow
   - nbserverproxy
-  - atoma
   - flask
   - pip:
     - ray[rllib]==0.6.0
@@ -16,3 +15,4 @@ dependencies:
     - matplotlib
     - bs4
     - lxml
+    - atoma
