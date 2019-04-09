@@ -3,8 +3,7 @@ cd qreader; git checkout relative-url; npm install; npm run build
 cd ..
 # enable nbserverproxy
 jupyter serverextension enable --sys-prefix nbserverproxy
-# install the webserver extension so that
-# flask launches at startup
-mv webserverextension.py ${NB_PYTHON_PREFIX}/lib/python*/site-packages/
-# enable webserver extension
-jupyter serverextension enable --sys-prefix webserverextension
+# install the tutorial extension to start processes
+mv tutorialextension.py ${NB_PYTHON_PREFIX}/lib/python*/site-packages/
+# enable tutorial extension
+jupyter serverextension enable --sys-prefix tutorialextension
