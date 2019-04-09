@@ -6,7 +6,7 @@ Try Ray on Binder (Experimental)
 
 Try the Ray tutorials online on `Binder`_.
 
-.. _`Binder`: https://mybinder.org/v2/gh/ray-project/tutorial/master
+.. _`Binder`: https://mybinder.org/v2/gh/adizim/tutorial/master
 
 Local Setup
 -----------
