@@ -1,0 +1,6 @@
+# enable nbserverproxy
+jupyter serverextension enable --sys-prefix nbserverproxy
+# install the tutorial extension to start processes
+mv tutorialextension.py ${NB_PYTHON_PREFIX}/lib/python*/site-packages/
+# enable tutorial extension
+jupyter serverextension enable --sys-prefix tutorialextension
