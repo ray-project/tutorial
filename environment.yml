@@ -18,4 +18,4 @@ dependencies:
     - lxml
     - scikit-learn
     - setproctitle
-    - atome
+    - atoma
