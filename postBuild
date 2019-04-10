@@ -1,5 +1,6 @@
 git clone https://github.com/ray-project/qreader
 cd qreader
+  python ../utilities/patch.py src/utils/axios.js
   npm install; npm run build
   cd dist
     sed -i 's-/static/-static/-g' index.html
