@@ -127,7 +127,7 @@ Pong = {
           if (window.location.hostname === "localhost") {
                 predict_url = "http://localhost:3000";
           } else {
-              predict_url = "http://" + window.location.host + ":3000";
+              predict_url = window.location.href.split("proxy")[0] + "proxy/3000";
           }
       }
 
