@@ -17,3 +17,5 @@ dependencies:
     - lxml
     - scikit-learn
     - setproctitle
+    - spacy
+    - wikipedia
