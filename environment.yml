@@ -9,10 +9,11 @@ dependencies:
   - psutil
   - nbserverproxy
   - pip:
-    - ray[all]==0.6.5
+    - ray[rllib]==0.6.5
     - keras
     - modin
     - matplotlib
     - bs4
     - lxml
     - scikit-learn
+    - setproctitle
