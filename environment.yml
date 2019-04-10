@@ -6,11 +6,12 @@ dependencies:
   - bokeh
   - ipywidgets=6.0.0
   - tensorflow
+  - psutil
   - pip:
-    - ray[rllib]==0.6.5
+    - ray[all]==0.6.5
     - keras
     - modin
     - matplotlib
     - bs4
     - lxml
-    - sklearn
+    - scikit-learn
