@@ -7,6 +7,7 @@ dependencies:
   - ipywidgets=6.0.0
   - tensorflow
   - psutil
+  - nbserverproxy
   - pip:
     - ray[all]==0.6.5
     - keras
