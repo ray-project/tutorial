@@ -1,3 +1,10 @@
+git clone https://github.com/ray-project/qreader
+cd qreader
+  npm install; npm run build
+  cd dist
+    sed -i 's-/static/-static/-g' index.html
+  cd ..
+cd ..
 # enable nbserverproxy
 jupyter serverextension enable --sys-prefix nbserverproxy
 # install the tutorial extension to start processes
