@@ -8,6 +8,8 @@ dependencies:
   - tensorflow
   - psutil
   - nbserverproxy
+  - flask
+  - flask-cors
   - pip:
     - ray[rllib]==0.6.5
     - keras
@@ -19,3 +21,4 @@ dependencies:
     - setproctitle
     - spacy
     - wikipedia
+    - atoma
