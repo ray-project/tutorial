@@ -10,7 +10,8 @@ from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras.preprocessing.image import ImageDataGenerator
 
-def load_data(generator=True, num_batches=600):
+
+def load_data(generator=False, data_size=10000, num_batches=600):
     num_classes = 10
 
     # input image dimensions
@@ -37,7 +38,10 @@ def load_data(generator=True, num_batches=600):
         idx = np.r_[:x.shape[0]]
         np.random.shuffle(idx)
         return x[idx], y[idx]
+
     x_train, y_train = shuffled(x_train, y_train)
+    x_train = x_train[:data_size]
+    y_train = y_train[:data_size]
     x_test, y_test = shuffled(x_test, y_test)
 
     # convert class vectors to binary class matrices
@@ -46,34 +50,40 @@ def load_data(generator=True, num_batches=600):
     if generator:
         datagen = ImageDataGenerator()
         return itertools.islice(datagen.flow(x_train, y_train), num_batches)
-    return x_train, x_test, y_train, y_test
+    return x_train, y_train, x_test, y_test
 
 
-def make_model():
+def make_model(lr=0.01, layer_size=128):
     """Create a Convolutional Nueral Network using Keras."""
     num_classes = 10
-    
+
     model = Sequential()
-    model.add(Conv2D(32, kernel_size=(3, 3),
-                     activation='relu', input_shape=(28, 28, 1)))
+    model = Sequential()
+    model.add(
+        Conv2D(
+            32, kernel_size=(3, 3), activation='relu', input_shape=(28, 28,
+                                                                    1)))
     model.add(Conv2D(64, (3, 3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(0.25))
     model.add(Flatten())
-    model.add(Dense(4, activation='relu'))
+    model.add(Dense(128, activation='relu'))
     model.add(Dropout(0.5))
     model.add(Dense(num_classes, activation='softmax'))
 
-    model.compile(loss=keras.losses.categorical_crossentropy,
-                  optimizer=keras.optimizers.SGD(
-                      lr=0.1, momentum=0.0),
-                  metrics=['accuracy'])
+    model.compile(
+        loss=keras.losses.categorical_crossentropy,
+        optimizer=keras.optimizers.rmsprop(lr=lr, decay=1e-6),
+        #                   keras.optimizers.SGD(
+        #                       lr=lr, momentum=momentum),
+        metrics=['accuracy'])
     return model
 
+
 def evaluate(model, validation=True):
-    train_data, val_data, train_labels, val_labels = load_data(generator=False)
-    data = val_data if validation else train_data
-    labels = val_labels if validation else train_labels
+    x_train, y_train, x_test, y_test = load_data(generator=False)
+    data = x_test if validation else x_train
+    labels = y_test if validation else y_train
 
     res = model.evaluate(data, labels)
     return dict(zip(model.metrics_names, res))
