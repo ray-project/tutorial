@@ -1,4 +1,4 @@
-git clone https://github.com/ray-project/qreader
+git clone -b learning https://github.com/ray-project/qreader
 cd qreader
   npm install; npm run build
   cd dist
