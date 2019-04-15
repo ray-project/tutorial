@@ -1,5 +1,9 @@
-Ray Tutorial
-============
+.. raw:: html
+
+  <div class="header">
+     <a href=http://ray.readthedocs.io/en/latest/index.html><img align="left" width="35%" src="https://github.com/ray-project/ray/raw/master/doc/source/images/ray_header_logo.png"></a>
+     <h1>Tutorial</h1>
+   </div>
 
 Try Ray on Binder (Experimental)
 --------------------------------
