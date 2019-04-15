@@ -100,7 +100,11 @@ def test_reporter(train_mnist_tune):
 
 
 def prepare_data(data):
-    new_data = np.array(data).reshape((1, 28, 28, 1)).astype(np.float32)
+    try:
+        new_data = np.array(data).reshape((1, 28, 28, 1)).astype(np.float32)
+    except ValueError as e:
+        print("Try running this notebook in `jupyter notebook`.")
+        raise e
     return ndimage.gaussian_filter(new_data, sigma=(0.5))
 
 
