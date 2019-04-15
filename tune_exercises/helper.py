@@ -106,13 +106,3 @@ def prepare_data(data):
         print("Try running this notebook in `jupyter notebook`.")
         raise e
     return ndimage.gaussian_filter(new_data, sigma=(0.5))
-
-
-def _test_code():
-    config = {"layer_size": 128, "lr": 0.01}
-    x_train, y_train, _, _ = load_data()
-    model = make_model(
-        lr=config.get("lr", 0.1), layer_size=config.get("layer_size", 4))
-    callbacks = [TuneCallback(lambda **kwargs: None)]
-    hist = model.fit(
-        x_train, y_train, verbose=0, batch_size=256, callbacks=callbacks)
