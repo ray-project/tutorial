@@ -24,7 +24,7 @@ import time
 
 
 if __name__ == "__main__":
-  ray.init(num_cpus=5, redirect_output=True)
+  ray.init(num_cpus=5)
 
   @ray.remote
   def f():
@@ -45,6 +45,8 @@ if __name__ == "__main__":
     results.append(result)
     print("Processing result which finished after {} seconds."
           .format(result - start_time))
+
+  duration = time.time() - start_time
 
   assert results == sorted(results), ("The results were not processed in the "
                                       "order that they finished.")
