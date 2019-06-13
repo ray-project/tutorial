@@ -66,6 +66,7 @@ class TuneCallback(keras.callbacks.Callback):
         """Reports the last result"""
         curr_acc = logs["acc"]
         if curr_acc > self.top_acc:
+            self.top_acc = curr_acc
             self.model.save_weights("weights_tune_tmp.h5")
             os.rename("weights_tune_tmp.h5", "weights_tune.h5")
 
