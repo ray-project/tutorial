@@ -173,4 +173,5 @@ Tune Exercise
 Tune is a library for distributed hyperparameter tuning.
 
 **tune_exercises/exercise_1_basics.ipynb** covers basics of using Tune - creating your first training function and using Tune. This tutorial uses Keras.
+
 **tune_exercises/exercise_2_optimize.ipynb** covers Search algorithms and Trial Schedulers to optimize your search process. This tutorial uses PyTorch.
