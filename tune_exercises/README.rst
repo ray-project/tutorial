@@ -3,7 +3,7 @@ Tune Tutorial
 
 .. raw:: html
 
-    <img src="./tune.jpg" height="200px">
+    <img src="https://github.com/ray-project/tutorial/raw/master/tune_exercises/tune.png" height="200px">
     
 
 Tuning hyperparameters is often the most expensive part of the machine learning workflow. Tune is built to address this, demonstrating an efficient and scalable solution for this pain point.
