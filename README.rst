@@ -170,16 +170,7 @@ and play against the trained policy.
 Tune Exercise
 -------------
 
-Tune is a tool for distributed hyperparameter search. There is one tutorial notebook 
-for Tune: 
+Tune is a library for distributed hyperparameter tuning.
 
-**tune_exercises/Tune.ipynb:** Introduces Tune and its various features on an MNIST example.
-
-The notebook can be opened in a Jupyter notebook by running the following commands. 
-
-.. code-block:: bash
-
-  cd tutorial/tune_exercises
-  jupyter-notebook
-  
-*Note*: The Tune notebook has exercises that don't work on Jupyter Lab. Answers can be found in ``tune_exercises/Tune-Answers.ipynb``. 
+**tune_exercises/exercise_1_basics.ipynb** covers basics of using Tune - creating your first training function and using Tune. This tutorial uses Keras.
+**tune_exercises/exercise_2_optimize.ipynb** covers Search algorithms and Trial Schedulers to optimize your search process. This tutorial uses PyTorch.
