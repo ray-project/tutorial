@@ -1,7 +1,10 @@
 Tune Tutorial
 -------------
 
-.. image:: ./tune.png
+.. raw:: html
+
+    <img src="./tune.jpg" height="200px">
+    
 
 Tuning hyperparameters is often the most expensive part of the machine learning workflow. Tune is built to address this, demonstrating an efficient and scalable solution for this pain point.
 
