@@ -8,6 +8,7 @@ Here are tutorial notebooks for using Tune.
 
 
 Concepts that are generally useful but have not been covered: 
+
 1. Using PBT
 2. Creating a Trainable with save and restore functions and checkpointing
 3. Distributed execution on a larger cluster
