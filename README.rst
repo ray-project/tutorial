@@ -1,12 +1,13 @@
 Ray Tutorial
 ============
 
-Try Ray on Binder (Experimental)
---------------------------------
+Try Ray on Binder
+-----------------
 
-Try the Ray tutorials online on `Binder`_.
+Try the Ray tutorials online on `Binder`_. Note that Binder will use very small
+machines, so the degree of parallelism will be limited.
 
-.. _`Binder`: https://mybinder.org/v2/gh/ray-project/tutorial/master
+.. _`Binder`: https://mybinder.org/v2/gh/ray-project/tutorial/master?urlpath=lab
 
 Local Setup
 -----------
@@ -14,13 +15,13 @@ Local Setup
 1. Make sure you have Python installed (we recommend using the `Anaconda Python
    distribution`_). Ray works with both Python 2 and Python 3. If you are unsure
    which to use, then use Python 3.
-   
+
    **If not using conda**, continue to step 2.
-   
+
    **If using conda**, you can then run the following commands and skip the next 4 steps:
-   
-   .. code-block:: bash 
-   
+
+   .. code-block:: bash
+
        git clone https://github.com/ray-project/tutorial
        cd tutorial
        conda env create -f environment.yml
@@ -28,7 +29,7 @@ Local Setup
 
 
 2. **Install Jupyter** with ``pip install jupyter``. Verify that you can start
-   a Jupyter notebook with the command ``jupyter-notebook``.
+   Jupyter lab with the command ``jupyter-lab``.
 
 3. **Install Ray** by running ``pip install -U ray``. Verify that you can run
 
@@ -71,17 +72,17 @@ Exercises
 ---------
 
 Each file ``exercises/exercise*.ipynb`` is a separate exercise. They can be
-opened in a Jupyter notebook by running the following commands.
+opened in Jupyter lab by running the following commands.
 
 .. code-block:: bash
 
   cd tutorial/exercises
-  jupyter-notebook
+  jupyter-lab
 
 If it asks for a password, just hit enter.
 
 Instructions are written in each file. To do each exercise, first run all of
-the cells in the Jupyter notebook. Then modify the ones that need to be modified
+the cells in Jupyter lab. Then modify the ones that need to be modified
 in order to prevent any exceptions from being raised. Throughout these
 exercises, you may find the `Ray documentation`_ helpful.
 
@@ -147,14 +148,13 @@ MapReduce system on top of Ray.
 RL Exercises
 ------------
 
-Each file in ``rl_exercises/rl_exercise*.ipynb`` is a separate Jupyter notebook.
-These exercises should be done in order. They can be opened in a Jupyter
-notebook by running the following commands.
+The exercises in ``rl_exercises/rl_exercise*.ipynb`` should be done in order.
+They can be opened in Jupyter lab by running the following commands.
 
 .. code-block:: bash
 
   cd tutorial/rl_exercises
-  jupyter-notebook
+  jupyter-lab
 
 **Exercise 1:** Introduction to Markov Decision Processes.
 

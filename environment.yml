@@ -5,13 +5,13 @@ dependencies:
   - python=3.6
   - bokeh
   - ipywidgets=6.0.0
-  - tensorflow
+  - tensorflow==1.14.0
   - psutil
   - nbserverproxy
   - flask
   - flask-cors
   - pip:
-    - ray[rllib]==0.6.5
+    - ray[rllib]==0.7.4
     - keras
     - modin
     - matplotlib
