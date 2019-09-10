@@ -1,10 +1,11 @@
 Ray Tutorial
 ============
 
-Try Ray on Binder (Experimental)
---------------------------------
+Try Ray on Binder
+-----------------
 
-Try the Ray tutorials online on `Binder`_.
+Try the Ray tutorials online on `Binder`_. Note that Binder will use very small
+machines, so the degree of parallelism will be limited.
 
 .. _`Binder`: https://mybinder.org/v2/gh/ray-project/tutorial/master
 
@@ -14,13 +15,13 @@ Local Setup
 1. Make sure you have Python installed (we recommend using the `Anaconda Python
    distribution`_). Ray works with both Python 2 and Python 3. If you are unsure
    which to use, then use Python 3.
-   
+
    **If not using conda**, continue to step 2.
-   
+
    **If using conda**, you can then run the following commands and skip the next 4 steps:
-   
-   .. code-block:: bash 
-   
+
+   .. code-block:: bash
+
        git clone https://github.com/ray-project/tutorial
        cd tutorial
        conda env create -f environment.yml
