@@ -7,7 +7,7 @@ Try Ray on Binder
 Try the Ray tutorials online on `Binder`_. Note that Binder will use very small
 machines, so the degree of parallelism will be limited.
 
-.. _`Binder`: https://mybinder.org/v2/gh/ray-project/tutorial/master
+.. _`Binder`: https://mybinder.org/v2/gh/ray-project/tutorial/master?urlpath=lab
 
 Local Setup
 -----------
