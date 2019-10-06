@@ -13,7 +13,7 @@ environment:
 commands:
   - name: tutorial
     help: "Start a jupyter notebook with the tutorials"
-    command: jupyter notebook
+    command: jupyter notebook --ip="0.0.0.0" --port 8889
     config:
       port_forward: 8889
 
