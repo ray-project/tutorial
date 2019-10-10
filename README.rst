@@ -8,11 +8,11 @@ Try the Ray tutorials online using Google Colab:
 
 - `Remote Functions`_
 - `Remote Actors`_
-- `Using ray.wait`_
+- `In-order Task Processing`_
 
 .. _`Remote Functions`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab01-03.ipynb
 .. _`Remote Actors`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab04-05.ipynb
-.. _`Using ray.wait`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab06-07.ipynb
+.. _`In-order Task Processing`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab06-07.ipynb
 
 Try Ray on Binder
 -----------------
