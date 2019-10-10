@@ -1,17 +1,17 @@
 Ray Tutorial
 ============
 
-Try Ray on Colab
-----------------
+Try Ray on Google Colab
+-----------------------
 
 Try the Ray tutorials online using Google Colab:
 
-- `Basic Ray API`_
-- `Using Ray actors`_
+- `Remote Functions`_
+- `Remote Actors`_
 - `Using ray.wait`_
 
-.. _`Basic Ray API`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab01-03.ipynb
-.. _`Using Ray actors`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab04-05.ipynb
+.. _`Remote Functions`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab01-03.ipynb
+.. _`Remote Actors`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab04-05.ipynb
 .. _`Using ray.wait`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab06-07.ipynb
 
 Try Ray on Binder
