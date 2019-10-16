@@ -11,9 +11,9 @@ Try the Ray tutorials online using Google Colab:
 - `In-Order Task Processing`_
 - `Reinforcement Learning with RLlib`_
 - Tune Tutorials
-  - `Getting Started (Part 1)`_
-  - `Optimization Algorithms (Part 2)`_
-  - `Population-based Training (Part 3)`_
+    - `Getting Started (Part 1)`_
+    - `Optimization Algorithms (Part 2)`_
+    - `Population-based Training (Part 3)`_
 
 .. _`Remote Functions`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab01-03.ipynb
 .. _`Remote Actors`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab04-05.ipynb
