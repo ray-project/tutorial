@@ -19,9 +19,9 @@ Try the Ray tutorials online using Google Colab:
 .. _`Remote Actors`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab04-05.ipynb
 .. _`In-Order Task Processing`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab06-07.ipynb
 .. _`Reinforcement Learning with RLlib`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/rllib_exercises/rllib_colab.ipynb
-.. - `Getting Started (Part 1)`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_1_basics.ipynb
-.. - `Optimization Algorithms (Part 2)`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_2_optimize.ipynb
-.. - `Population-based Training (Part 3)`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_3_pbt.ipynb
+.. _`Getting Started (Part 1)`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_1_basics.ipynb
+.. _`Optimization Algorithms (Part 2)`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_2_optimize.ipynb
+.. _`Population-based Training (Part 3)`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_3_pbt.ipynb
 
 Try Ray on Binder
 -----------------
