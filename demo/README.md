@@ -1,7 +1,7 @@
 Ray Live Demo
 =============
 
-This demo can be run live while presenting to show off Ray.
+This demo can be run live while presenting to show Ray's capabilities.
 
 ## Instructions
 1. Launch a Ray cluster on AWS with `ray up cluster_config.yaml`
