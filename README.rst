@@ -10,19 +10,41 @@ Try the Ray tutorials online using Google Colab:
 - `Remote Actors`_
 - `In-Order Task Processing`_
 - `Reinforcement Learning with RLlib`_
-- Tune Tutorials
-    - `Getting Started (Part 1)`_
-    - `Optimization Algorithms (Part 2)`_
-    - `Population-based Training (Part 3)`_
 
 .. _`Remote Functions`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab01-03.ipynb
 .. _`Remote Actors`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab04-05.ipynb
 .. _`In-Order Task Processing`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/exercises/colab06-07.ipynb
 .. _`Reinforcement Learning with RLlib`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/rllib_exercises/rllib_colab.ipynb
-.. _`Getting Started (Part 1)`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_1_basics.ipynb
-.. _`Optimization Algorithms (Part 2)`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_2_optimize.ipynb
-.. _`Population-based Training (Part 3)`: https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_3_pbt.ipynb
 
+Try Tune on Google Colab
+------------------------
+
+Tuning hyperparameters is often the most expensive part of the machine learning workflow. `Ray Tune <http://tune.io>`_ is built to address this, demonstrating an efficient and scalable solution for this pain point.
+
+`Exercise 1 <https://github.com/ray-project/tutorial/tree/master/tune_exercises/exercise_1_basics.ipynb>`_ covers basics of using Tune - creating your first training function and using Tune. This tutorial uses Keras. 
+
+.. raw:: html
+
+    <a href="https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_1_basics.ipynb" target="_parent">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Tune Tutorial"/>
+    </a>
+
+`Exercise 2 <https://github.com/ray-project/tutorial/tree/master/tune_exercises/exercise_2_optimize.ipynb>`_ covers Search algorithms and Trial Schedulers. This tutorial uses PyTorch.
+
+.. raw:: html
+
+    <a href="https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_2_optimize.ipynb" target="_parent">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Tune Tutorial"/>
+    </a>
+
+`Exercise 3 <https://github.com/ray-project/tutorial/tree/master/tune_exercises/exercise_3_pbt.ipynb>`_  covers using Population-Based Training (PBT) and uses the advanced Trainable API with save and restore functions and checkpointing.
+
+.. raw:: html
+
+    <a href="https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_3_pbt.ipynb" target="_parent">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Tune Tutorial"/>
+    </a>
+    
 Try Ray on Binder
 -----------------
 
