@@ -20,14 +20,29 @@ Tuning hyperparameters is often the most expensive part of the machine learning 
 Notebooks
 ---------
 
-1. exercise_1_basics.ipynb covers basics of using Tune - creating your first training function and using Tune. This tutorial uses Keras.
-2. exercise_2_optimize.ipynb covers Search algorithms and Trial Schedulers. This tutorial uses PyTorch.
+`Exercise 1 <https://github.com/ray-project/tutorial/tree/master/tune_exercises/exercise_1_basics.ipynb>`_ covers basics of using Tune - creating your first training function and using Tune. This tutorial uses Keras. 
 
+.. raw:: html
 
-Concepts that are generally useful but have not been covered: 
+    <a href="https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_1_basics.ipynb" target="_parent">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Tune Tutorial"/>
+    </a>
 
-1. Using PBT
-2. Creating a Trainable with save and restore functions and checkpointing
-3. Distributed execution on a larger cluster
+`Exercise 2 <https://github.com/ray-project/tutorial/tree/master/tune_exercises/exercise_2_optimize.ipynb>`_ covers Search algorithms and Trial Schedulers. This tutorial uses PyTorch.
+
+.. raw:: html
+
+    <a href="https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_2_optimize.ipynb" target="_parent">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Tune Tutorial"/>
+    </a>
+
+`Exercise 3 <https://github.com/ray-project/tutorial/tree/master/tune_exercises/exercise_3_pbt.ipynb>`_  covers using Population-Based Training and uses the advanced Trainable API with save and restore functions and checkpointing.
+
+.. raw:: html
+
+    <a href="https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_3_pbt.ipynb" target="_parent">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Tune Tutorial"/>
+    </a>
+
 
 Please open an issue if you have any questions or identify any issues. All suggestions and contributions welcome!
