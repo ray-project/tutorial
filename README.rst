@@ -21,7 +21,7 @@ Try Tune on Google Colab
 
 Tuning hyperparameters is often the most expensive part of the machine learning workflow. `Ray Tune <http://tune.io>`_ is built to address this, demonstrating an efficient and scalable solution for this pain point.
 
-`Exercise 1 <https://github.com/ray-project/tutorial/tree/master/tune_exercises/exercise_1_basics.ipynb>`_ covers basics of using Tune - creating your first training function and using Tune. This tutorial uses Keras. 
+`Exercise 1 <https://github.com/ray-project/tutorial/tree/master/tune_exercises/exercise_1_basics.ipynb>`_ covers basics of using Tune - creating your first training function and using Tune. This tutorial uses Keras.
 
 .. raw:: html
 
@@ -44,7 +44,7 @@ Tuning hyperparameters is often the most expensive part of the machine learning 
     <a href="https://colab.research.google.com/github/ray-project/tutorial/blob/master/tune_exercises/exercise_3_pbt.ipynb" target="_parent">
     <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Tune Tutorial"/>
     </a>
-    
+
 Try Ray on Binder
 -----------------
 
@@ -73,7 +73,7 @@ Local Setup
 
 
 2. **Install Jupyter** with ``pip install jupyter``. Verify that you can start
-   Jupyter lab with the command ``jupyter-lab``.
+   Jupyter lab with the command ``jupyter-lab`` or ``jupyter-notebook``.
 
 3. **Install Ray** by running ``pip install -U ray``. Verify that you can run
 
