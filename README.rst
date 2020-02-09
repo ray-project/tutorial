@@ -123,7 +123,7 @@ opened in Jupyter lab by running the following commands.
   cd tutorial/exercises
   jupyter-lab
 
-If it asks for a password, just hit enter.
+If you don't have `jupyter-lab`, try `jupyter-notebook`. If it asks for a password, just hit enter.
 
 Instructions are written in each file. To do each exercise, first run all of
 the cells in Jupyter lab. Then modify the ones that need to be modified
