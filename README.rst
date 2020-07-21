@@ -90,7 +90,14 @@ Local Setup
 
       git clone https://github.com/ray-project/tutorial.git
 
-5. Install the following additional dependencies.
+5. Install the additional dependencies.
+
+   Either install them from the given requirements.txt
+
+    .. code-block:: bash
+      pip install -r requirements.txt
+
+   Or install them manually
 
     .. code-block:: bash
 
