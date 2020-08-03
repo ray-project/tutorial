@@ -1,6 +1,9 @@
 Ray Tutorial
 ============
 
+See the new Anyscale Academy tutorials at https://github.com/anyscale/academy.
+
+
 Try Ray on Google Colab
 -----------------------
 
