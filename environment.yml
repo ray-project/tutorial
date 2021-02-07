@@ -10,6 +10,7 @@ dependencies:
   - nbserverproxy
   - flask
   - flask-cors
+  - requests
   - pip:
     - ray[rllib]==0.7.4
     - keras
