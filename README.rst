@@ -1,7 +1,8 @@
 Ray Tutorial
 ============
 
-See the new Anyscale Academy tutorials at https://github.com/anyscale/academy.
+**NOTE**: These sets of tutorials have been **deprecated**. A portion of their modules have
+been incorporated into the new Anyscale Academy tutorials at https://github.com/anyscale/academy.
 
 
 Try Ray on Google Colab
